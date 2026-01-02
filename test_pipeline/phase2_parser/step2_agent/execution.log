@@ -1,0 +1,28 @@
+Command: uv run parser parse-refs /home/shazzadul/Illinois_Tech/Spring26/RA/Github/new/Phagocyte/test_pipeline/phase1_research/research/research_report.md -o /home/shazzadul/Illinois_Tech/Spring26/RA/Github/new/Phagocyte/test_pipeline/phase2_parser/step2_agent --agent claude --format both --export-batch --export-dois
+Exit Code: 0
+Output:
+
+============================================================
+Running AGENT (claude) parsing...
+============================================================
+Using model: claude-sonnet-4-20250514
+✓ JSON: /home/shazzadul/Illinois_Tech/Spring26/RA/Github/new/Phagocyte/test_pipeline/phase2_parser/step2_agent/references.json
+✓ Markdown: /home/shazzadul/Illinois_Tech/Spring26/RA/Github/new/Phagocyte/test_pipeline/phase2_parser/step2_agent/references.md
+✓ Batch export (9 papers): /home/shazzadul/Illinois_Tech/Spring26/RA/Github/new/Phagocyte/test_pipeline/phase2_parser/step2_agent/batch.json
+  Use with: parser batch /home/shazzadul/Illinois_Tech/Spring26/RA/Github/new/Phagocyte/test_pipeline/phase2_parser/step2_agent/batch.json -o ./papers
+✓ DOI export (6 identifiers): /home/shazzadul/Illinois_Tech/Spring26/RA/Github/new/Phagocyte/test_pipeline/phase2_parser/step2_agent/dois.txt
+  Use with: parser doi2bib -i /home/shazzadul/Illinois_Tech/Spring26/RA/Github/new/Phagocyte/test_pipeline/phase2_parser/step2_agent/dois.txt -o references.bib
+✓ Raw response: /home/shazzadul/Illinois_Tech/Spring26/RA/Github/new/Phagocyte/test_pipeline/phase2_parser/step2_agent/agent_raw_response.txt
+✓ Full result: /home/shazzadul/Illinois_Tech/Spring26/RA/Github/new/Phagocyte/test_pipeline/phase2_parser/step2_agent/agent_result.json
+
+Found 28 references (agent):
+  doi: 2
+  pdf: 1
+  paper: 3
+  arxiv: 4
+  blog: 2
+  github: 9
+  website: 3
+  youtube: 2
+  book: 2
+warning: `VIRTUAL_ENV=/home/shazzadul/Illinois_Tech/Spring26/RA/Github/new/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead

@@ -1,0 +1,26 @@
+# .retrieval_progress
+
+**Type:** Object (1 keys)
+
+## Structure
+
+```json
+{
+  "completed": [
+    "10.48550/arXiv.2312.10997",
+    "CRUD-RAG: A Comprehensive Chinese Benchmark for Retrieval-Augmented Generation of Large Language Models",
+    "RAGBench: Explainable Benchmark for Retrieval-Augmented Generation Systems",
+    "RAGAs: Automated Evaluation of Retrieval Augmented Generation",
+    "10.48550/arXiv.2407.11005",
+    "Automated Evaluation of Retrieval-Augmented Language Models with Task-Specific Exam Generation",
+    "10.48550/arXiv.2310.11511",
+    "Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection",
+    "Searching for Best Practices in Retrieval-Augmented Generation",
+    "Benchmarking Large Language Models in Retrieval-Augmented Generation",
+    "10.1609/aaai.v38i16.29728",
+    "10.48550/arXiv.2401.15884",
+    "10.18653/v1/2024.emnlp-main.981",
+    "Corrective Retrieval Augmented Generation"
+  ]
+}
+```
