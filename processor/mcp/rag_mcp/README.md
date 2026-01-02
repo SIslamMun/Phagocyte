@@ -28,9 +28,11 @@ uv run rag-mcp --config_generate
 uv run rag-mcp --config ./my_config.yaml
 ```
 
-## Claude Desktop Configuration
+## Editor Configuration
 
-Add to your `claude_desktop_config.json`:
+### Claude Desktop
+
+**Config:** `~/.config/Claude/claude_desktop_config.json` (Linux) | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
 ```json
 {
@@ -43,6 +45,90 @@ Add to your `claude_desktop_config.json`:
   }
 }
 ```
+
+### Claude Code (CLI)
+
+```bash
+claude mcp add rag -- uv run rag-mcp
+```
+
+Or add to `~/.claude/settings.json`:
+```json
+{
+  "mcpServers": {
+    "rag": {
+      "command": "uv",
+      "args": ["run", "rag-mcp"],
+      "cwd": "/path/to/processor"
+    }
+  }
+}
+```
+
+### Cursor
+
+**Config:** `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global)
+
+```json
+{
+  "mcpServers": {
+    "rag": {
+      "command": "uv",
+      "args": ["run", "rag-mcp"],
+      "cwd": "/path/to/processor"
+    }
+  }
+}
+```
+
+### VS Code + GitHub Copilot
+
+**Config:** `.vscode/settings.json` or User Settings
+
+```json
+{
+  "mcp.servers": {
+    "rag": {
+      "command": "uv",
+      "args": ["run", "rag-mcp"],
+      "cwd": "${workspaceFolder}/processor"
+    }
+  }
+}
+```
+
+### Windsurf
+
+**Config:** `~/.windsurf/mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "rag": {
+      "command": "uv",
+      "args": ["run", "rag-mcp"],
+      "cwd": "/path/to/processor"
+    }
+  }
+}
+```
+
+### Zed
+
+**Config:** `~/.config/zed/settings.json`
+
+```json
+{
+  "context_servers": {
+    "rag": {
+      "command": { "path": "uv", "args": ["run", "rag-mcp"] },
+      "settings": {}
+    }
+  }
+}
+```
+
+---
 
 ## Available Tools
 

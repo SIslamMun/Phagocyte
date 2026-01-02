@@ -20,9 +20,11 @@ uv sync --extra gemini      # Gemini agent
 uv run parser-mcp
 ```
 
-## Claude Desktop Configuration
+## Editor Configuration
 
-Add to your `claude_desktop_config.json`:
+### Claude Desktop
+
+**Config:** `~/.config/Claude/claude_desktop_config.json` (Linux) | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
 ```json
 {
@@ -39,6 +41,94 @@ Add to your `claude_desktop_config.json`:
   }
 }
 ```
+
+### Claude Code (CLI)
+
+```bash
+claude mcp add parser -- uv run parser-mcp
+```
+
+Or add to `~/.claude/settings.json`:
+```json
+{
+  "mcpServers": {
+    "parser": {
+      "command": "uv",
+      "args": ["run", "parser-mcp"],
+      "cwd": "/path/to/parser",
+      "env": { "PAPER_EMAIL": "your@email.com" }
+    }
+  }
+}
+```
+
+### Cursor
+
+**Config:** `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global)
+
+```json
+{
+  "mcpServers": {
+    "parser": {
+      "command": "uv",
+      "args": ["run", "parser-mcp"],
+      "cwd": "/path/to/parser",
+      "env": { "PAPER_EMAIL": "your@email.com" }
+    }
+  }
+}
+```
+
+### VS Code + GitHub Copilot
+
+**Config:** `.vscode/settings.json` or User Settings
+
+```json
+{
+  "mcp.servers": {
+    "parser": {
+      "command": "uv",
+      "args": ["run", "parser-mcp"],
+      "cwd": "${workspaceFolder}/parser",
+      "env": { "PAPER_EMAIL": "${env:PAPER_EMAIL}" }
+    }
+  }
+}
+```
+
+### Windsurf
+
+**Config:** `~/.windsurf/mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "parser": {
+      "command": "uv",
+      "args": ["run", "parser-mcp"],
+      "cwd": "/path/to/parser",
+      "env": { "PAPER_EMAIL": "your@email.com" }
+    }
+  }
+}
+```
+
+### Zed
+
+**Config:** `~/.config/zed/settings.json`
+
+```json
+{
+  "context_servers": {
+    "parser": {
+      "command": { "path": "uv", "args": ["run", "parser-mcp"] },
+      "settings": {}
+    }
+  }
+}
+```
+
+---
 
 ## Available Tools (7)
 

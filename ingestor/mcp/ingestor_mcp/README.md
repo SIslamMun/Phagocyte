@@ -30,9 +30,11 @@ uv sync --extra all
 uv run ingestor-mcp
 ```
 
-## Claude Desktop Configuration
+## Editor Configuration
 
-Add to your `claude_desktop_config.json`:
+### Claude Desktop
+
+**Config:** `~/.config/Claude/claude_desktop_config.json` (Linux) | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
 ```json
 {
@@ -45,6 +47,90 @@ Add to your `claude_desktop_config.json`:
   }
 }
 ```
+
+### Claude Code (CLI)
+
+```bash
+claude mcp add ingestor -- uv run ingestor-mcp
+```
+
+Or add to `~/.claude/settings.json`:
+```json
+{
+  "mcpServers": {
+    "ingestor": {
+      "command": "uv",
+      "args": ["run", "ingestor-mcp"],
+      "cwd": "/path/to/ingestor"
+    }
+  }
+}
+```
+
+### Cursor
+
+**Config:** `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global)
+
+```json
+{
+  "mcpServers": {
+    "ingestor": {
+      "command": "uv",
+      "args": ["run", "ingestor-mcp"],
+      "cwd": "/path/to/ingestor"
+    }
+  }
+}
+```
+
+### VS Code + GitHub Copilot
+
+**Config:** `.vscode/settings.json` or User Settings
+
+```json
+{
+  "mcp.servers": {
+    "ingestor": {
+      "command": "uv",
+      "args": ["run", "ingestor-mcp"],
+      "cwd": "${workspaceFolder}/ingestor"
+    }
+  }
+}
+```
+
+### Windsurf
+
+**Config:** `~/.windsurf/mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "ingestor": {
+      "command": "uv",
+      "args": ["run", "ingestor-mcp"],
+      "cwd": "/path/to/ingestor"
+    }
+  }
+}
+```
+
+### Zed
+
+**Config:** `~/.config/zed/settings.json`
+
+```json
+{
+  "context_servers": {
+    "ingestor": {
+      "command": { "path": "uv", "args": ["run", "ingestor-mcp"] },
+      "settings": {}
+    }
+  }
+}
+```
+
+---
 
 ## Available Tools
 

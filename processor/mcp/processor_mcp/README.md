@@ -16,9 +16,11 @@ uv sync --extra mcp
 uv run processor-mcp
 ```
 
-## Claude Desktop Configuration
+## Editor Configuration
 
-Add to your `claude_desktop_config.json`:
+### Claude Desktop
+
+**Config:** `~/.config/Claude/claude_desktop_config.json` (Linux) | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
 ```json
 {
@@ -31,6 +33,90 @@ Add to your `claude_desktop_config.json`:
   }
 }
 ```
+
+### Claude Code (CLI)
+
+```bash
+claude mcp add processor -- uv run processor-mcp
+```
+
+Or add to `~/.claude/settings.json`:
+```json
+{
+  "mcpServers": {
+    "processor": {
+      "command": "uv",
+      "args": ["run", "processor-mcp"],
+      "cwd": "/path/to/processor"
+    }
+  }
+}
+```
+
+### Cursor
+
+**Config:** `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global)
+
+```json
+{
+  "mcpServers": {
+    "processor": {
+      "command": "uv",
+      "args": ["run", "processor-mcp"],
+      "cwd": "/path/to/processor"
+    }
+  }
+}
+```
+
+### VS Code + GitHub Copilot
+
+**Config:** `.vscode/settings.json` or User Settings
+
+```json
+{
+  "mcp.servers": {
+    "processor": {
+      "command": "uv",
+      "args": ["run", "processor-mcp"],
+      "cwd": "${workspaceFolder}/processor"
+    }
+  }
+}
+```
+
+### Windsurf
+
+**Config:** `~/.windsurf/mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "processor": {
+      "command": "uv",
+      "args": ["run", "processor-mcp"],
+      "cwd": "/path/to/processor"
+    }
+  }
+}
+```
+
+### Zed
+
+**Config:** `~/.config/zed/settings.json`
+
+```json
+{
+  "context_servers": {
+    "processor": {
+      "command": { "path": "uv", "args": ["run", "processor-mcp"] },
+      "settings": {}
+    }
+  }
+}
+```
+
+---
 
 ## Available Tools
 

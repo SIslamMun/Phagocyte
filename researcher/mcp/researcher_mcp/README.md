@@ -28,9 +28,11 @@ export GOOGLE_API_KEY="your-api-key"
 
 Get an API key from: https://aistudio.google.com/
 
-## Claude Desktop Configuration
+## Editor Configuration
 
-Add to your `claude_desktop_config.json`:
+### Claude Desktop
+
+**Config:** `~/.config/Claude/claude_desktop_config.json` (Linux) | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
 ```json
 {
@@ -46,6 +48,94 @@ Add to your `claude_desktop_config.json`:
   }
 }
 ```
+
+### Claude Code (CLI)
+
+```bash
+claude mcp add researcher -- uv run researcher-mcp
+```
+
+Or add to `~/.claude/settings.json`:
+```json
+{
+  "mcpServers": {
+    "researcher": {
+      "command": "uv",
+      "args": ["run", "researcher-mcp"],
+      "cwd": "/path/to/researcher",
+      "env": { "GEMINI_API_KEY": "your-api-key" }
+    }
+  }
+}
+```
+
+### Cursor
+
+**Config:** `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global)
+
+```json
+{
+  "mcpServers": {
+    "researcher": {
+      "command": "uv",
+      "args": ["run", "researcher-mcp"],
+      "cwd": "/path/to/researcher",
+      "env": { "GEMINI_API_KEY": "your-api-key" }
+    }
+  }
+}
+```
+
+### VS Code + GitHub Copilot
+
+**Config:** `.vscode/settings.json` or User Settings
+
+```json
+{
+  "mcp.servers": {
+    "researcher": {
+      "command": "uv",
+      "args": ["run", "researcher-mcp"],
+      "cwd": "${workspaceFolder}/researcher",
+      "env": { "GEMINI_API_KEY": "${env:GEMINI_API_KEY}" }
+    }
+  }
+}
+```
+
+### Windsurf
+
+**Config:** `~/.windsurf/mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "researcher": {
+      "command": "uv",
+      "args": ["run", "researcher-mcp"],
+      "cwd": "/path/to/researcher",
+      "env": { "GEMINI_API_KEY": "your-api-key" }
+    }
+  }
+}
+```
+
+### Zed
+
+**Config:** `~/.config/zed/settings.json`
+
+```json
+{
+  "context_servers": {
+    "researcher": {
+      "command": { "path": "uv", "args": ["run", "researcher-mcp"], "env": { "GEMINI_API_KEY": "your-api-key" } },
+      "settings": {}
+    }
+  }
+}
+```
+
+---
 
 ## Available Tools
 
