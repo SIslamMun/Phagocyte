@@ -2001,6 +2001,7 @@ all = [
     { name = "claude-agent-sdk" },
     { name = "google-adk" },
     { name = "google-generativeai" },
+    { name = "mcp" },
     { name = "mypy" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
@@ -2026,6 +2027,9 @@ gemini = [
 google-adk = [
     { name = "google-adk" },
 ]
+mcp = [
+    { name = "mcp" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -2047,6 +2051,8 @@ requires-dist = [
     { name = "google-generativeai", marker = "extra == 'all'", specifier = ">=0.8.0" },
     { name = "google-generativeai", marker = "extra == 'gemini'", specifier = ">=0.8.0" },
     { name = "httpx", specifier = ">=0.27.0" },
+    { name = "mcp", marker = "extra == 'all'", specifier = ">=1.2.0" },
+    { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.2.0" },
     { name = "mypy", marker = "extra == 'all'", specifier = ">=1.10.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.10.0" },
     { name = "pydantic", specifier = ">=2.0" },
@@ -2064,7 +2070,7 @@ requires-dist = [
     { name = "tenacity", specifier = ">=8.0.0" },
     { name = "webdriver-manager", specifier = ">=4.0.2" },
 ]
-provides-extras = ["dev", "claude-sdk", "anthropic", "gemini", "google-adk", "agents", "all"]
+provides-extras = ["dev", "claude-sdk", "anthropic", "gemini", "google-adk", "agents", "mcp", "all"]
 
 [[package]]
 name = "pathspec"
