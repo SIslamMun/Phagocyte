@@ -1,6 +1,7 @@
 """Output writer for extraction results."""
 
 import json
+import re
 from pathlib import Path
 
 import aiofiles
@@ -52,6 +53,7 @@ class OutputWriter:
         output_dir.mkdir(parents=True, exist_ok=True)
 
         # Process and write images
+        original_images = result.images.copy() if result.images else []
         if result.has_images:
             img_dir = output_dir / "img"
             img_dir.mkdir(exist_ok=True)
@@ -68,6 +70,11 @@ class OutputWriter:
 
             # Update result with processed images for metadata
             result.images = processed_images
+
+            # Update markdown with renamed image filenames
+            result.markdown = self._update_image_references(
+                result.markdown, original_images, processed_images
+            )
 
         # Write markdown
         md_path = output_dir / f"{name}.md"
@@ -147,6 +154,57 @@ class OutputWriter:
             name = name[:100]
 
         return name.strip("_")
+
+    def _update_image_references(
+        self,
+        markdown: str,
+        original_images: list,
+        processed_images: list,
+    ) -> str:
+        """Update markdown image references with renamed filenames.
+
+        Args:
+            markdown: Original markdown content
+            original_images: List of original ExtractedImage objects
+            processed_images: List of processed ExtractedImage objects with new filenames
+
+        Returns:
+            Markdown with updated image references
+        """
+        if not original_images or not processed_images:
+            return markdown
+
+        # Build mapping from old filename to new filename
+        filename_map = {}
+        for orig, proc in zip(original_images, processed_images):
+            if orig.filename != proc.filename:
+                filename_map[orig.filename] = proc.filename
+
+        if not filename_map:
+            return markdown
+
+        # Replace image references in markdown
+        # Pattern matches ![alt](./img/filename) or ![alt](img/filename)
+        def replace_image_ref(match: re.Match) -> str:
+            alt_text = match.group(1)
+            img_path = match.group(2)
+
+            # Extract filename from path
+            old_filename = Path(img_path).name
+
+            if old_filename in filename_map:
+                new_filename = filename_map[old_filename]
+                # Preserve the path prefix (./img/ or img/)
+                path_prefix = img_path.rsplit(old_filename, 1)[0]
+                return f"![{alt_text}]({path_prefix}{new_filename})"
+
+            return match.group(0)
+
+        # Match markdown image syntax: ![alt](path)
+        pattern = r"!\[([^\]]*)\]\(([^)]+)\)"
+        markdown = re.sub(pattern, replace_image_ref, markdown)
+
+        return markdown
 
 
 class OutputWriterSync:

@@ -48,12 +48,21 @@ def _build_figure_map(image_files: list[str]) -> dict[int, str]:
     - figure1.png, figure2.png
     - fig1.png, fig2.png
     - Figure_1.png
+    - document_img_001.png (standard ingestor naming)
     """
     figure_map: dict[int, str] = {}
 
     for filename in image_files:
         # Extract number from filename
+        # Try figure/fig pattern first
         match = re.search(r"(?:figure|fig)[_-]?(\d+)", filename, re.IGNORECASE)
+        if match:
+            num = int(match.group(1))
+            figure_map[num] = filename
+            continue
+
+        # Try _img_XXX pattern (standard ingestor naming)
+        match = re.search(r"_img_(\d+)", filename, re.IGNORECASE)
         if match:
             num = int(match.group(1))
             figure_map[num] = filename

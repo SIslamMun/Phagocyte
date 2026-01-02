@@ -147,6 +147,20 @@ Referring to Fig. 1, we can see...
         result = process_figures(content, images)
         assert "![Figure 1]" in result
 
+    def test_img_pattern_naming(self):
+        """Test ingestor standard naming convention (_img_XXX)."""
+        content = """
+Fig. 1. System architecture.
+
+Some text here.
+
+Fig. 2. Performance results.
+"""
+        images = ["document_name_img_001.png", "document_name_img_002.png"]
+        result = process_figures(content, images)
+        assert "![Figure 1](./img/document_name_img_001.png)" in result
+        assert "![Figure 2](./img/document_name_img_002.png)" in result
+
 
 class TestProcessBibliography:
     """Tests for bibliography processing."""

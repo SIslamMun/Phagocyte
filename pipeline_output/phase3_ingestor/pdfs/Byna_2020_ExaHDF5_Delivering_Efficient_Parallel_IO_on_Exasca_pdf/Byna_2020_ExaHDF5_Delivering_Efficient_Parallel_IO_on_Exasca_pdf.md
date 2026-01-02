@@ -64,7 +64,7 @@ There are multiple I/O libraries, such as PnetCDF [[2]](#ref-2) and ADIOS [[3]](
 
 We have presented the benefits of the developed features individually as these have been developed for different use cases. For instance, Data Elevator is for using burst buffers on systems that have the hardware. Full SWMR is for applications that require multiple readers analyzing data while a writer is adding data to an HDF5 file. Integrating all these features into the single HDF5 product requires a greater engineering effort, which will occur in the next phase of the project.
 
-![Figure 1](./img/figure1.png)
+![Figure 1](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_001.png)
 
 Fig.1. Library usage at NERSC on Cori and Edison in 2017 using the statistics collected by Automatic Library Tracking Database (ALTD) 3 ○ .
 
@@ -116,7 +116,7 @@ In our recent work, we have integrated the VOL feature implementation into the m
 
 Our implementation of VOL allows VOL connectors widely accessible to the HDF5 community and will encourage more developers to use or create new connectors for the HDF5 library. The VOL implementation is currently available in the 'develop' branch as we write this paper 8 ○ , which is available for public access. The HDF Group is working on releasing the feature as the next major public release. Several VOL connectors have been or are under development but
 
-![Figure 2](./img/figure2.png)
+![Figure 2](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_002.png)
 
 Fig.2. Overview of the Virtual Object Layer (VOL) architecture within HDF5.
 
@@ -142,7 +142,7 @@ Elevator library to intercept MPI-IO data write calls. This extension will cover
 
 In Fig.3, we show a high-level overview of the write and read caching implementations of Data Elevator. The main issues we target to address with DE are 1) to provide a transparent mechanism for using a burst buffer (BB) as a part of a hierarchical storage system, and 2) to move data between different layers of a hierarchical storage system efficiently with low resource contention on BB nodes. The data stored temporarily in the burst buffer can be reused for any analysis. Hence, we call this feature caching instead of simply buffering the data.
 
-![Figure 3](./img/figure3.png)
+![Figure 3](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_003.png)
 
 Fig.3. Overview of Data Elevator write caching functionality. The arrows from IOCI to DEMT are control requests and the the remaining arrows are requests for data. IOCI: I/O Call Interceptor. DEMT: Data Elevator Metadata Table.
 
@@ -166,7 +166,7 @@ Data Elevator applies various optimizations to improve I/O performance in writin
 
 In read caching, we have implemented caching and prefetching chunks of data based on the history of HDF5 chunk accesses [[5]](#ref-5) . The cached chunks are stored as binary files in a faster persistent storage device, such as an SSD-based burst buffer. When the requests to the prefetched data come, DE redirects the read requests to the cached data and thus improving performance significantly.
 
-![Figure 4](./img/figure4.png)
+![Figure 4](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_004.png)
 
 The data flow path for read caching in Data Elevator is shown in Fig.4. We highlight the prefetching function of Data Elevator that improves the performance of array-based analysis programs by reading ahead data from the disk-based file system to the SSD-based burst buffer. An array is prefetched as data chunks. In the figure, we show an array with 12 (i.e., a 3 × 4 array) chunks. Let us assume that an analysis task is accessing the first two chunks (marked in green) that are read from the disk-based file system.
 
@@ -204,7 +204,7 @@ Handling 'Meta' Flush Dependencies . Objects that an SWMR writer is modifying in
 
 In Fig.5, we show a typical situation in the metadata cache for a chunked dataset. All the entries for the chunk index (an extensible array, in this case) have a 'top' proxy entry that reflects the dirty state of all the entries in the index (i.e., if any index entry is dirty, the index's top proxy will be dirty also). Similarly, all the entries in the object header depend on a 'bottom' proxy, which will keep any of them from being flushed (i.e., if the bottom proxy is dirty, no dirty object header entries can be flushed). Therefore, making the bottom proxy of the object header the flush dependency parent of the top proxy for the extensible array will force all extensible array entries to be written to the file and marked clean in the metadata cache before any dirty object header entries can be written to the file.
 
-![Figure 5](./img/figure5.png)
+![Figure 5](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_005.png)
 
 Fig.5. Typical situation of the HDF5 metadata cache for a chunked dataset.
 
@@ -271,7 +271,7 @@ We have implemented Data Elevator in C and compiled with Intel compilers. Our te
 
 We evaluated various configurations of Data Elevator using two parallel I/O benchmarks: VPIC-IO and Chombo-IO. Both benchmarks have a single time step and generate a single HDF5 file. VPIC-IO is a parallel I/O kernel of a plasma physics simulation code, called VPIC. In our tests, VPIC-IO writes 2 million particles and 8 properties per particle, resulting in a file of 64 GB in size. The I/O pattern of VPIC-IO is similar to particle simulation codes in the ECP, where each particle has a set of properties, and a large number of particles are studied. As shown in Fig.6, using Data Elevator for moving the data related to a single time step achieves 5.6x speedup on average over Cray DataWarp and 5x speedup on average over writing data directly to Lustre.
 
-![Figure 6](./img/figure6.png)
+![Figure 6](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_006.png)
 
 Fig.6. Evaluation of Data Elevator write caching functionality I/O time of a plasma physics simulation's (VPIC-IO) data write pattern.
 
@@ -281,7 +281,7 @@ Chombo-IO is derived from Chombo, a popular block-structured adaptive mesh refin
 
 256 × 256 × 256 and is of 146 GB in size. The I/O pattern of this benchmark is representative of the subsurface flow simulation application in the ECP. In Fig.7, we show the performance benefit of the Data Elevator library. Chombo-IO benchmark achieves 2x benefit (on average) over Lustre and 5x benefit (on average) over Cray DataWarp.
 
-![Figure 7](./img/figure7.png)
+![Figure 7](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_007.png)
 
 Fig.7. Evaluation of Data Elevator write caching functionality I/O time of a Chombo adaptive mesh refinement (AMR) code's I/O kernel.
 
@@ -295,7 +295,7 @@ We compare DE reading (labeled ARCHIE in the plots representing Array Caching in
 
 data used to detect extreme weather events [[8]](#ref-8) , gradient computation of plasma physics dataset using a 3D magnetic field data generated by a VPIC simulation [[9]](#ref-9) , and vorticity computation on combustion data produced by an S3D simulation that captures key turbulencechemistry interactions in a combustion engine [[10]](#ref-10) .
 
-![Figure 8](./img/figure8.png)
+![Figure 8](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_008.png)
 
 In our evaluation of DE reading with CNN of a climate dataset, we focus on the most time-consuming step, i.e., convolution computing, in CNNs. The CAM5 dataset used in this test is a 3D array with size [31 , 768 , 1 152], where 768 and 1 182 are the latitude and the longitude dimensions, respectively, and 31 is the number of height levels from the earth into the atmosphere. The filter size for the convolution is [4 , 4]. The chunk size is [31 , 768 , 32], resulting in a total of 36 chunks. The analysis application runs with 9 MPI processes. We run DE with another 9 processes. In this configuration, there are 4 batches of reads, and each batch accesses 9 chunks. We present the read time of the analysis application in Fig.8. Reading all the data from the disks, i.e., Lustre, gives the worst performance, as expected. Using DataWarp to move the data from Lustre to the burst buffer reduces the time by 1.7x for reading data, but it contains initial overhead in staging the data in the burst buffer. Using the DE cache on both the disks and on the SSDs reduces the time for reading data. The advantage of DE comes from converting non-contiguous reads into contiguous reads. Data Elevator can also prefetch data to be accessed in the future into the burst buffer as chunks and achieves the best performance. Overall, for the CNN use case, DE is 3.1x faster than Lustre and 1.8x faster than DataWarp.
 
@@ -309,7 +309,7 @@ $$\text{grad} (x, y, z) = \nabla f (x, y, z), \quad \underbrace { (1)}_{\mathfra
 
 where f represents magnetic value and ∇ denotes the Laplace operator.
 
-![Figure 9](./img/figure9.png)
+![Figure 9](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_009.png)
 
 The chunk size for parallel array processing is [250 , 250 , 100], giving a total of 512 chunks. Our tests use 128 processes to run the analysis program and use only 64 processes to run DE. In this test, we have a ghost zone with a size of [1 , 1 , 1]. We present the read time of this analysis in Fig.9. The performance comparison has the same pattern as that of convolution on CAM5 data. Overall, DE is 2.7x faster than Lustre and 2.4x faster than DataWarp.
 
@@ -317,7 +317,7 @@ Fig.9. Data read time profiles for gradient computation of VPIC data. ARCHIE rep
 
 <!-- image -->
 
-![Figure 10](./img/figure10.png)
+![Figure 10](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_010.png)
 
 S3D simulation code captures key turbulencechemistry interactions in a combustion engine. An attribute to study the turbulent motion is vorticity, which defines the local spinning motion for a specific location. Given the z component of the vorticity at a point ( x, y ), the vorticity analysis accesses four neighbors for each point at ( x +1 , y ), ( x -1 , y ), ( x, y -1) and ( x, y +1), as defined in [[11]](#ref-11). Our tests use a 3D array with size [1 100 , 1 080 , 1 408]. The chunk size is [110 , 108 , 176] and the ghost zone size is [1 , 1 , 1], giving 800 chunks. We use 100 processes to run analysis programs and 50 processes to run DE. The read performance comparison is shown in Fig.10. The analysis program reads all 800 chunks in 8 batches. DE outperforms Lustre by 5.8x and is 7x better than DataWarp. In this case, DataWarp performs 1.2x slower than Lustre.
 
@@ -329,13 +329,13 @@ Fig.10. Data read time profiles for vorticity computation of a combustion simula
 
 We ran experiments with asynchronous I/O enabled in HDF5 on the Cori system. The tests used an I/O kernel from a plasma physics simulation (VPIC) that writes 8 variables per particle at 5 timesteps. The number of MPI processes is varied from 2 to 4k cores, in multiples of 2. During the computation time between subsequent time steps, which is emulated with a 20second sleep time, Argobot tasks started on threads perform I/O by overlapping I/O time fully with the computation time.
 
-![Figure 11](./img/figure11.png)
+![Figure 11](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_011.png)
 
 In Fig.11 and Fig.12, we show a comparison of write time and read time, respectively, with and without the asynchronous I/O. In Fig.11, we show the I/O time for writing data produced by a simulation kernel and for reading data to be analyzed, where using asynchronous I/O obtains 4x improvement. In these cases, I/O related to 4 of the 5 timesteps is overlapped with computation. The last timestep's I/O has to be completed before the program exits, which is not overlapped. The overall performance benefit is hence dependent on the number of time steps used.
 
 ## 5.3 Full SWMR
 
-![Figure 13](./img/figure13.png)
+![Figure 13](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_013.png)
 
 To evaluate the performance of full SWMR, we have implemented a version of SWMR-like functionality with locks using MPI (labeled non-SWMR in Fig.13 and Fig.14). We compare the performance of this nonSWMR with the full SWMR implementation in HDF5 for a single writer to write 1D data to an HDF5 dataset, where the write size is varied between 1 KB and 512 MB for 100 times. While the single writer process is writ- ing data, three readers open the dataset and read the newly written data concurrently.
 
@@ -343,7 +343,7 @@ To evaluate the performance of full SWMR, we have implemented a version of SWMR-
 
 Fig.11. Parallel write performance of HDF5 with asynchronous I/O enabled (HDF5-async) compared with the current HDF5 implementation.
 
-![Figure 12](./img/figure12.png)
+![Figure 12](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_012.png)
 
 Fig.12. Parallel read performance of HDF5 with asynchronous I/O enabled (HDF5-async) compared with the current HDF5 implementation.
 
@@ -359,7 +359,7 @@ In Fig.13, we show the raw comparison, and in Fig.14, we show the speedup number
 
 Initial benchmarking of the parallel querying implementation prototype on Cori resulted in the following scalability plots (Fig.15 and Fig.16) which show the time taken to 1) construct the FastBit index; and 2) evaluate a query of the form: finding all elements in the 'Energy' dataset whose value is greater than 1.9 (i.e., 'Energy &gt; 1.9'). The data used for this query
 
-![Figure 14](./img/figure14.png)
+![Figure 14](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_014.png)
 
 Fig.14. Speedup of SWMR over non-SWMR in writing dataset with different write sizes.
 
@@ -367,13 +367,13 @@ Fig.14. Speedup of SWMR over non-SWMR in writing dataset with different write si
 
 was obtained from a plasma physics simulation (VPIC) ran for understanding the magnetic field interactions in a magnetic reconnection phenomenon of space weather scenario. The HDF5 file contained particle properties, such as the spatial locations in 3D, corresponding velocities, and energy of particles. Each property was stored as an HDF5 dataset that contains 623 520 550 elements represented as 32-bit floating point values.
 
-![Figure 15](./img/figure15.png)
+![Figure 15](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_015.png)
 
 Fig.15. Parallel index generation time, where the indexes are based bitmap indexes generated by the FastBit indexing library.
 
 <!-- image -->
 
-![Figure 16](./img/figure16.png)
+![Figure 16](./img/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf_img_016.png)
 
 Fig.16. Parallel query evaluation time.
 
