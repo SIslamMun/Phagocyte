@@ -181,10 +181,7 @@ class ContentDetector:
             ".mp3", ".mp4", ".wav", ".avi", ".mov",
         }
 
-        if file_path.suffix.lower() in binary_extensions:
-            return False
-
-        return True
+        return file_path.suffix.lower() not in binary_extensions
 
     def is_image_file(self, file_path: Path) -> bool:
         """Check if file is a processable image (for multimodal embedding)."""

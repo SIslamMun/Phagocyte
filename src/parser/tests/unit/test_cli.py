@@ -74,4 +74,4 @@ class TestParseRefsCommand:
         md_file = tmp_path / "research.md"
         md_file.write_text(sample_research_text)
 
-        result = runner.invoke(cli, ["parse-refs", str(md_file)])
+        runner.invoke(cli, ["parse-refs", str(md_file)])

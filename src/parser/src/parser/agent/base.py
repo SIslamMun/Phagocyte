@@ -73,7 +73,7 @@ For each reference, extract:
 - type: One of the categories above
 - value: The identifier/URL/title
 - title: Title if available
-- authors: Authors if available  
+- authors: Authors if available
 - year: Publication year if available
 - url: Full URL if available (ALWAYS include URLs when present)
 - context: Brief context of how it's mentioned
@@ -124,7 +124,7 @@ Extract ALL references - be comprehensive. Do not miss any URLs."""
 
     def __init__(self, api_key: str | None = None, model: str | None = None):
         """Initialize the agent.
-        
+
         Args:
             api_key: API key for the agent service
             model: Model to use (e.g., 'claude-sonnet-4-20250514', 'gemini-2.0-flash')
@@ -147,10 +147,10 @@ Extract ALL references - be comprehensive. Do not miss any URLs."""
     @abstractmethod
     async def parse_async(self, text: str) -> AgentParseResult:
         """Parse text asynchronously and extract references.
-        
+
         Args:
             text: Document text to parse
-            
+
         Returns:
             AgentParseResult with extracted references
         """
@@ -158,10 +158,10 @@ Extract ALL references - be comprehensive. Do not miss any URLs."""
 
     def parse(self, text: str) -> AgentParseResult:
         """Parse text synchronously and extract references.
-        
+
         Args:
             text: Document text to parse
-            
+
         Returns:
             AgentParseResult with extracted references
         """
@@ -170,10 +170,10 @@ Extract ALL references - be comprehensive. Do not miss any URLs."""
 
     def parse_file(self, file_path: Path) -> AgentParseResult:
         """Parse a file and extract references.
-        
+
         Args:
             file_path: Path to file
-            
+
         Returns:
             AgentParseResult with extracted references
         """
@@ -196,10 +196,10 @@ Extract ALL references - be comprehensive. Do not miss any URLs."""
 
     def _parse_response_json(self, response_text: str) -> list[ParsedReference]:
         """Parse JSON response from agent into ParsedReference list.
-        
+
         Args:
             response_text: Raw response from agent
-            
+
         Returns:
             List of ParsedReference objects
         """

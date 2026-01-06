@@ -1,5 +1,6 @@
 """LanceDB loading and indexing."""
 
+import contextlib
 import json
 from datetime import datetime
 from pathlib import Path
@@ -131,7 +132,7 @@ class LanceDBLoader:
 
         if self.METADATA_TABLE in db.table_names():
             # Update existing metadata
-            table = db.open_table(self.METADATA_TABLE)
+            db.open_table(self.METADATA_TABLE)
             # Replace all records
             db.drop_table(self.METADATA_TABLE)
             db.create_table(self.METADATA_TABLE, metadata_records)
@@ -151,7 +152,7 @@ class LanceDBLoader:
 
         table = db.open_table(self.METADATA_TABLE)
         records = table.to_pandas()
-        return dict(zip(records["key"], records["value"]))
+        return dict(zip(records["key"], records["value"], strict=False))
 
     async def load_chunks(
         self,
@@ -299,32 +300,26 @@ class LanceDBLoader:
             return
 
         # Create IVF-PQ index on text_vector
-        try:
+        with contextlib.suppress(Exception):
             table.create_index(
                 metric="L2",
                 num_partitions=min(256, row_count // 10),
                 num_sub_vectors=96,
                 vector_column_name="text_vector",
             )
-        except Exception:
-            pass
 
         # Create IVF-PQ index on visual_vector
-        try:
+        with contextlib.suppress(Exception):
             table.create_index(
                 metric="L2",
                 num_partitions=min(256, row_count // 10),
                 num_sub_vectors=96,
                 vector_column_name="visual_vector",
             )
-        except Exception:
-            pass
 
         # Create FTS index on VLM description
-        try:
+        with contextlib.suppress(Exception):
             table.create_fts_index("vlm_description")
-        except Exception:
-            pass
 
     def _image_chunk_to_record(self, chunk: ImageChunk) -> dict:
         """Convert ImageChunk to image table record.

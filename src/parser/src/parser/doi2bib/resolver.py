@@ -112,14 +112,14 @@ NEW_ARXIV_ID_PATTERN = re.compile(r"^\d{4}\.\d{4,5}(?:v\d+)?$")
 
 def _arxiv_has_doi(arxiv_id: str) -> bool:
     """Check if an arXiv ID has a 10.48550 DOI.
-    
+
     Only new-style arXiv IDs (YYMM.NNNNN format, post-April 2007) have
     DOIs in the 10.48550/arXiv.XXXX format. Old-style IDs (archive/YYMMNNN)
     do not have these DOIs.
-    
+
     Args:
         arxiv_id: arXiv ID string
-        
+
     Returns:
         True if the arXiv ID has a 10.48550 DOI
     """

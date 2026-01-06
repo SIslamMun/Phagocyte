@@ -12,7 +12,7 @@ from .base import AgentParser, AgentParseResult
 
 class AnthropicAgent(AgentParser):
     """Agent that uses Anthropic Claude for reference parsing.
-    
+
     Supports two backends:
     - claude-agent-sdk: No API key needed (uses Claude Code CLI)
     - anthropic: Requires API key
@@ -35,7 +35,7 @@ class AnthropicAgent(AgentParser):
         use_agent_sdk: bool = True,  # Default to agent SDK (no API key needed)
     ):
         """Initialize Anthropic agent.
-        
+
         Args:
             api_key: Anthropic API key (only needed if use_agent_sdk=False)
             model: Model to use (default: claude-sonnet-4-20250514)
@@ -57,10 +57,10 @@ class AnthropicAgent(AgentParser):
 
     async def parse_async(self, text: str) -> AgentParseResult:
         """Parse text using Claude asynchronously.
-        
+
         Args:
             text: Document text to parse
-            
+
         Returns:
             AgentParseResult with extracted references
         """
@@ -164,10 +164,10 @@ Now extract ALL references from the document above and return them as a JSON arr
 
     def parse(self, text: str) -> AgentParseResult:
         """Parse text using Claude synchronously.
-        
+
         Args:
             text: Document text to parse
-            
+
         Returns:
             AgentParseResult with extracted references
         """
@@ -178,7 +178,7 @@ Now extract ALL references from the document above and return them as a JSON arr
 
     def _parse_sync_with_agent_sdk(self, text: str) -> AgentParseResult:
         """Parse using claude-agent-sdk synchronously.
-        
+
         Falls back to direct Anthropic SDK if agent SDK fails.
         """
         import asyncio

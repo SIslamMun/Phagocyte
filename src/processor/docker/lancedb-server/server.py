@@ -253,7 +253,7 @@ async def get_metadata():
 
         table = connection.open_table("_metadata")
         rows = table.to_pandas()
-        metadata = dict(zip(rows["key"], rows["value"]))
+        metadata = dict(zip(rows["key"], rows["value"], strict=False))
 
         return {"metadata": metadata}
     except Exception as e:

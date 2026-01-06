@@ -6,7 +6,7 @@ produce detailed, cited reports.
 
 Example:
     from researcher import DeepResearcher, ResearchConfig
-    
+
     researcher = DeepResearcher()
     result = await researcher.research("What are the latest advances in quantum computing?")
     print(result.report)

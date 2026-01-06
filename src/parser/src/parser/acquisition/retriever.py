@@ -138,7 +138,7 @@ class PaperRetriever:
 
             if self.config.is_source_enabled("scihub"):
                 from .clients import ScihubClient
-                scihub_config = unofficial_config.get("scihub", {})
+                unofficial_config.get("scihub", {})
                 scihub_delay = per_source_delays.get("scihub", 5.0)
                 clients["scihub"] = ScihubClient(
                     enabled=True,
@@ -149,7 +149,7 @@ class PaperRetriever:
 
             if self.config.is_source_enabled("libgen"):
                 from .clients import LibGenClient
-                libgen_config = unofficial_config.get("libgen", {})
+                unofficial_config.get("libgen", {})
                 libgen_delay = per_source_delays.get("libgen", 3.0)
                 clients["libgen"] = LibGenClient(
                     enabled=True,
@@ -219,7 +219,7 @@ class PaperRetriever:
         metadata = await self._resolve_metadata(doi, title, arxiv_id, pdf_url)
         resolved_doi = metadata.get("doi") if metadata else doi
         resolved_title = metadata.get("title") if metadata else title
-        resolved_arxiv = metadata.get("arxiv_id") if metadata else arxiv_id
+        metadata.get("arxiv_id") if metadata else arxiv_id
         resolved_pdf_url = metadata.get("pdf_url") if metadata else pdf_url
         year = metadata.get("year") if metadata else None
 
@@ -691,7 +691,7 @@ class PaperRetriever:
 
     async def _try_arxiv(self, client, doi, title, output_path, logger) -> tuple[RetrievalResult | None, str]:
         """Try arXiv source.
-        
+
         Order of attempts:
         1. arXiv ID (if provided in DOI like 10.48550/arXiv.XXXX.XXXXX)
         2. arXiv URL (if title contains arxiv.org URL)
@@ -785,7 +785,7 @@ class PaperRetriever:
 
     async def _try_frontiers(self, client, doi, title, output_path, logger) -> tuple[RetrievalResult | None, str]:
         """Try Frontiers source with Selenium for bot protection.
-        
+
         Frontiers is a Gold OA publisher but uses CloudFlare protection.
         """
         if not doi:
@@ -855,7 +855,7 @@ class PaperRetriever:
 
     async def _try_acl_anthology(self, client, doi, title, output_path, logger) -> tuple[RetrievalResult | None, str]:
         """Try ACL Anthology source for NLP papers.
-        
+
         ACL Anthology hosts papers from ACL, EMNLP, NAACL, etc.
         All papers are freely available.
         """
@@ -1022,7 +1022,7 @@ class PaperRetriever:
 
     async def _try_scihub(self, client, doi, title, output_path, logger) -> tuple[RetrievalResult | None, str]:
         """Try Sci-Hub (unofficial).
-        
+
         Lookup priority: title -> DOI (title first tends to have better hit rate)
         """
         logger.detail("Trying Sci-Hub mirrors...")
@@ -1050,7 +1050,7 @@ class PaperRetriever:
 
     async def _try_libgen(self, client, doi, title, output_path, logger) -> tuple[RetrievalResult | None, str]:
         """Try LibGen (unofficial).
-        
+
         Lookup priority: title -> DOI (title first tends to have better hit rate)
         """
         logger.detail("Trying LibGen mirrors...")
@@ -1084,12 +1084,12 @@ class PaperRetriever:
 
     def _titles_match(self, title1: str, title2: str, threshold: float = 0.6) -> bool:
         """Check if two titles are similar enough.
-        
+
         Uses two methods:
         1. Substring match: If one title contains the other (for truncated titles)
            Only matches if shorter is at least 60% of longer length
         2. Word overlap: Jaccard similarity of words
-        
+
         Args:
             title1: First title (usually the query)
             title2: Second title (usually the found result)
@@ -1128,18 +1128,18 @@ class PaperRetriever:
 
     def _validate_found_doi(self, expected_title: str, found_doi: str, found_title: str = "", found_abstract: str = "") -> tuple[bool, str | None]:
         """Validate that a DOI found during search is appropriate.
-        
+
         This catches cases like:
         - Peer review DOIs instead of paper DOIs
         - Book chapter DOIs when the original paper is elsewhere
         - False positive title matches (e.g., "llama" animal vs "LLaMA" AI model)
-        
+
         Args:
             expected_title: The title we're looking for
             found_doi: The DOI that was found
             found_title: The title from the DOI metadata
             found_abstract: Optional abstract text
-            
+
         Returns:
             Tuple of (is_valid, rejection_reason)
         """

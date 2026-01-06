@@ -62,40 +62,36 @@ def validate_reference(ref: ParsedReference) -> ValidationResult:
             ))
 
     # Validate DOI format
-    if ref.type == ReferenceType.DOI:
-        if not validate_doi(ref.value):
-            errors.append(ValidationError(
-                field="value",
-                message=f"Invalid DOI format: {ref.value}",
-                severity="error"
-            ))
+    if ref.type == ReferenceType.DOI and not validate_doi(ref.value):
+        errors.append(ValidationError(
+            field="value",
+            message=f"Invalid DOI format: {ref.value}",
+            severity="error"
+        ))
 
     # Validate arXiv ID format
-    if ref.type == ReferenceType.ARXIV:
-        if not validate_arxiv_id(ref.value):
-            errors.append(ValidationError(
-                field="value",
-                message=f"Invalid arXiv ID format: {ref.value}",
-                severity="error"
-            ))
+    if ref.type == ReferenceType.ARXIV and not validate_arxiv_id(ref.value):
+        errors.append(ValidationError(
+            field="value",
+            message=f"Invalid arXiv ID format: {ref.value}",
+            severity="error"
+        ))
 
     # Validate URL
-    if ref.url:
-        if not validate_url(ref.url):
-            errors.append(ValidationError(
-                field="url",
-                message=f"Invalid or malformed URL: {ref.url}",
-                severity="error"
-            ))
+    if ref.url and not validate_url(ref.url):
+        errors.append(ValidationError(
+            field="url",
+            message=f"Invalid or malformed URL: {ref.url}",
+            severity="error"
+        ))
 
     # Validate GitHub repo format
-    if ref.type == ReferenceType.GITHUB:
-        if not validate_github_repo(ref.value):
-            errors.append(ValidationError(
-                field="value",
-                message=f"Invalid GitHub repository format: {ref.value}",
-                severity="error"
-            ))
+    if ref.type == ReferenceType.GITHUB and not validate_github_repo(ref.value):
+        errors.append(ValidationError(
+            field="value",
+            message=f"Invalid GitHub repository format: {ref.value}",
+            severity="error"
+        ))
 
     # Check for missing metadata
     if ref.type == ReferenceType.PAPER:
@@ -136,10 +132,10 @@ def validate_doi(doi: str) -> bool:
 
 def classify_doi(doi: str) -> dict:
     """Classify a DOI to detect potential issues.
-    
+
     Args:
         doi: DOI string
-        
+
     Returns:
         Dict with classification info:
         - type: 'paper', 'book_chapter', 'review', 'dataset', 'unknown'
@@ -246,10 +242,10 @@ def classify_doi(doi: str) -> dict:
 
 def is_problematic_doi(doi: str) -> tuple[bool, str | None]:
     """Check if a DOI is problematic and should be skipped or flagged.
-    
+
     Args:
         doi: DOI string
-        
+
     Returns:
         Tuple of (is_problematic, reason)
     """
@@ -304,9 +300,7 @@ def validate_url(url: str) -> bool:
         # Count parentheses
         open_parens = url.count('(')
         close_parens = url.count(')')
-        if open_parens != close_parens:
-            return False
-        return True
+        return open_parens == close_parens
     except Exception:
         return False
 
@@ -336,10 +330,7 @@ def validate_github_repo(repo: str) -> bool:
 
     # Check for valid characters
     valid_chars = re.compile(r'^[a-zA-Z0-9_.-]+$')
-    if not valid_chars.match(owner) or not valid_chars.match(name):
-        return False
-
-    return True
+    return not (not valid_chars.match(owner) or not valid_chars.match(name))
 
 
 def validate_references(refs: list[ParsedReference], fix: bool = False) -> tuple[list[ParsedReference], list[ValidationResult]]:
@@ -418,15 +409,15 @@ CONFUSING_TERMS = {
 
 def detect_title_context_mismatch(expected_title: str, actual_title: str, actual_abstract: str | None = None) -> tuple[bool, str | None]:
     """Detect if a retrieved paper title suggests a context mismatch.
-    
+
     This catches cases like searching for "LLaMA" (AI model) and getting
     "Camelid Herd Health" (about actual llamas).
-    
+
     Args:
         expected_title: The title we're looking for
         actual_title: The title of the paper that was found
         actual_abstract: Optional abstract text for additional context
-        
+
     Returns:
         Tuple of (is_mismatch, reason)
     """
@@ -465,12 +456,12 @@ def detect_title_context_mismatch(expected_title: str, actual_title: str, actual
 
 def validate_paper_match(expected_title: str, actual_doi: str, actual_metadata: dict | None = None) -> tuple[bool, str | None]:
     """Validate that a DOI actually matches the expected paper.
-    
+
     Args:
         expected_title: The title we're looking for
         actual_doi: The DOI that was found
         actual_metadata: Optional metadata from the DOI resolver
-        
+
     Returns:
         Tuple of (is_valid_match, warning_message)
     """

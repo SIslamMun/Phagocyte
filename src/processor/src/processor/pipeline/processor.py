@@ -362,7 +362,7 @@ class Pipeline:
         texts = [c.content for c in chunks]
         embeddings = await embedder.embed_batch(texts, batch_size=batch_size)
 
-        for chunk, embedding in zip(chunks, embeddings):
+        for chunk, embedding in zip(chunks, embeddings, strict=False):
             chunk.embedding = embedding
 
         return chunks
@@ -397,7 +397,7 @@ class Pipeline:
             texts, batch_size=self.config.embedding.batch_size
         )
 
-        for chunk, embedding in zip(image_chunks, text_embeddings):
+        for chunk, embedding in zip(image_chunks, text_embeddings, strict=False):
             chunk.text_embedding = embedding
 
         # Get visual embeddings from images (if CLIP available)
@@ -411,7 +411,7 @@ class Pipeline:
             try:
                 visual_embeddings = await multimodal_embedder.embed_images(image_paths)
 
-                for chunk, embedding in zip(image_chunks, visual_embeddings):
+                for chunk, embedding in zip(image_chunks, visual_embeddings, strict=False):
                     chunk.visual_embedding = embedding
             except Exception as e:
                 console.print(f"[yellow]Visual embedding failed: {e}[/yellow]")

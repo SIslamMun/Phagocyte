@@ -102,7 +102,7 @@ async def rerank_results(
     scores = reranker.predict(pairs)
 
     # Combine with original documents
-    scored = list(zip(candidates, scores))
+    scored = list(zip(candidates, scores, strict=False))
 
     # Sort by reranking score (higher is better)
     scored.sort(key=lambda x: x[1], reverse=True)

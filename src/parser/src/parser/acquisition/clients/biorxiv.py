@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import time
 from pathlib import Path
 from typing import Any
@@ -20,7 +21,7 @@ class BioRxivClient(BaseClient):
     - medRxiv: Medical/health sciences preprints
 
     Both share DOI prefix 10.1101.
-    
+
     Includes Selenium fallback for bot-protected downloads.
     """
 
@@ -29,7 +30,7 @@ class BioRxivClient(BaseClient):
 
     def __init__(self, use_selenium: bool = True):
         """Initialize the bioRxiv client.
-        
+
         Args:
             use_selenium: Whether to use Selenium for bot-protected downloads
         """
@@ -82,13 +83,13 @@ class BioRxivClient(BaseClient):
 
     async def download_pdf(self, doi: str, output_path: Path) -> bool:
         """Download PDF for a bioRxiv/medRxiv paper.
-        
+
         Tries httpx first, falls back to Selenium if blocked.
-        
+
         Args:
             doi: The DOI (must start with 10.1101)
             output_path: Path to save the PDF
-            
+
         Returns:
             True if download succeeded
         """
@@ -133,11 +134,11 @@ class BioRxivClient(BaseClient):
 
     async def _download_with_selenium(self, pdf_url: str, output_path: Path) -> bool:
         """Download PDF using Selenium to bypass bot protection.
-        
+
         Args:
             pdf_url: URL of the PDF
             output_path: Path to save the PDF
-            
+
         Returns:
             True if download succeeded
         """
@@ -230,10 +231,8 @@ class BioRxivClient(BaseClient):
                 return False
             finally:
                 if driver:
-                    try:
+                    with contextlib.suppress(Exception):
                         driver.quit()
-                    except Exception:
-                        pass
 
         return await loop.run_in_executor(None, do_download)
 

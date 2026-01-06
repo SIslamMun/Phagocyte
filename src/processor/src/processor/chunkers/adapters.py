@@ -135,7 +135,7 @@ class LlamaIndexCodeAdapter(BaseChunker):
 
             # Convert to our Chunk type
             chunks = []
-            for i, node in enumerate(nodes):
+            for _i, node in enumerate(nodes):
                 content_type = self._get_content_type(ext)
 
                 chunk = Chunk.create(
@@ -262,7 +262,7 @@ class LlamaIndexMarkdownAdapter(BaseChunker):
             nodes = parser.get_nodes_from_documents([doc])
 
             chunks = []
-            for i, node in enumerate(nodes):
+            for _i, node in enumerate(nodes):
                 # Extract section path from metadata if available
                 section_path = None
                 if hasattr(node, "metadata"):

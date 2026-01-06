@@ -13,7 +13,7 @@ def create_agent(
     model: str | None = None,
 ) -> AgentParser:
     """Create an agent instance.
-    
+
     Args:
         agent_type: Type of agent:
             - 'claude': Claude via claude-agent-sdk (NO API key needed - uses Claude Code CLI)
@@ -22,10 +22,10 @@ def create_agent(
             - 'google': Gemini via google-generativeai (requires GOOGLE_API_KEY)
         api_key: API key for the service (not needed for claude)
         model: Model to use (uses default if not specified)
-        
+
     Returns:
         AgentParser instance
-        
+
     Raises:
         ValueError: If agent_type is not supported
     """
@@ -61,7 +61,7 @@ def create_agent(
 
 def list_available_agents() -> list[dict]:
     """List available agent types with their details.
-    
+
     Returns:
         List of agent info dictionaries
     """
@@ -103,10 +103,10 @@ def list_available_agents() -> list[dict]:
 
 def is_agent_available(agent_type: AgentType) -> tuple[bool, str]:
     """Check if an agent type is available (package installed).
-    
+
     Args:
         agent_type: Type of agent to check
-        
+
     Returns:
         Tuple of (available, message)
     """

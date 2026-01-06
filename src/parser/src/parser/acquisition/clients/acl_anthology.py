@@ -1,7 +1,7 @@
 """ACL Anthology client for downloading NLP papers.
 
 ACL Anthology (https://aclanthology.org/) is an open-access archive
-of papers from the Association for Computational Linguistics and 
+of papers from the Association for Computational Linguistics and
 related organizations (EMNLP, NAACL, CoNLL, etc.).
 
 All papers are freely available - no authentication needed.
@@ -20,7 +20,7 @@ import httpx
 
 class ACLAnthologyClient:
     """Client for downloading papers from ACL Anthology.
-    
+
     ACL Anthology hosts papers from:
     - ACL (Association for Computational Linguistics)
     - EMNLP (Empirical Methods in NLP)
@@ -28,7 +28,7 @@ class ACLAnthologyClient:
     - EACL (European ACL)
     - CoNLL (Computational Natural Language Learning)
     - And many other NLP venues
-    
+
     DOI format: 10.18653/v1/{anthology_id}
     Example: 10.18653/v1/N19-1423 (BERT paper)
     """
@@ -43,7 +43,7 @@ class ACLAnthologyClient:
         rate_limit: float = 1.0,
     ):
         """Initialize the ACL Anthology client.
-        
+
         Args:
             enabled: Whether the client is enabled
             timeout: Request timeout in seconds
@@ -64,10 +64,10 @@ class ACLAnthologyClient:
 
     def _extract_anthology_id(self, doi: str) -> str | None:
         """Extract ACL Anthology ID from DOI.
-        
+
         Args:
             doi: DOI like "10.18653/v1/N19-1423"
-            
+
         Returns:
             Anthology ID like "N19-1423" or None
         """
@@ -87,10 +87,10 @@ class ACLAnthologyClient:
 
     def is_acl_doi(self, doi: str) -> bool:
         """Check if a DOI is from ACL Anthology.
-        
+
         Args:
             doi: DOI to check
-            
+
         Returns:
             True if it's an ACL DOI
         """
@@ -102,11 +102,11 @@ class ACLAnthologyClient:
         output_path: Path,
     ) -> dict[str, Any] | None:
         """Download paper by DOI.
-        
+
         Args:
             doi: ACL DOI (e.g., "10.18653/v1/N19-1423")
             output_path: Path to save the PDF
-            
+
         Returns:
             Dict with 'pdf_path' and 'source' if successful, None otherwise
         """
@@ -125,11 +125,11 @@ class ACLAnthologyClient:
         output_path: Path,
     ) -> dict[str, Any] | None:
         """Download paper by ACL Anthology ID.
-        
+
         Args:
             anthology_id: ACL Anthology ID (e.g., "N19-1423", "2020.emnlp-main.1")
             output_path: Path to save the PDF
-            
+
         Returns:
             Dict with 'pdf_path' and 'source' if successful, None otherwise
         """
@@ -188,11 +188,11 @@ class ACLAnthologyClient:
         limit: int = 5,
     ) -> list[dict[str, Any]]:
         """Search ACL Anthology by title.
-        
+
         Args:
             title: Paper title to search
             limit: Maximum results to return
-            
+
         Returns:
             List of matching papers with anthology IDs
         """
@@ -225,11 +225,11 @@ class ACLAnthologyClient:
 
     def _parse_search_results(self, html: str, limit: int) -> list[dict[str, Any]]:
         """Parse search results from ACL Anthology HTML.
-        
+
         Args:
             html: HTML content from search page
             limit: Maximum results
-            
+
         Returns:
             List of paper metadata
         """
@@ -257,7 +257,7 @@ class ACLAnthologyClient:
 
     def is_available(self) -> bool:
         """Check if client is available.
-        
+
         Returns:
             True if enabled
         """

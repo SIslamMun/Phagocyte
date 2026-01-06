@@ -512,11 +512,11 @@ class InstitutionalAccessClient:
         output_path: Path | None = None,
     ) -> Path | None:
         """Download PDF via EZProxy using saved cookies.
-        
+
         Args:
             doi: Paper DOI
             output_path: Where to save the PDF
-            
+
         Returns:
             Path to downloaded PDF, or None if failed
         """
@@ -623,11 +623,11 @@ class InstitutionalAccessClient:
 
     def _find_pdf_link(self, html: str, base_url: str) -> str | None:
         """Find PDF link in HTML page.
-        
+
         Args:
             html: HTML content
             base_url: Base URL for relative links
-            
+
         Returns:
             PDF URL or None
         """

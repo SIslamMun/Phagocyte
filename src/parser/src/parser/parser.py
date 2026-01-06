@@ -419,10 +419,7 @@ class ResearchParser:
                         year_match = re.search(r'\b(19|20)\d{2}\b', context)
                         if year_match:
                             potential_year = int(year_match.group(0))
-                            if 1900 <= potential_year <= 2099:
-                                year = year_match.group(0)
-                            else:
-                                year = ""
+                            year = year_match.group(0) if 1900 <= potential_year <= 2099 else ""
                         else:
                             year = ""
                 except ValueError:
@@ -694,7 +691,7 @@ class ResearchParser:
 
     def _deduplicate(self, refs: list[ParsedReference]) -> list[ParsedReference]:
         """Remove duplicate references.
-        
+
         Handles both same-type duplicates (same type + value) and cross-type
         duplicates (e.g., paper title extracted as PAPER but also has URL as WEBSITE).
         """

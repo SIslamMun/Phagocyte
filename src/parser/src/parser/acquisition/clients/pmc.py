@@ -152,11 +152,11 @@ class PMCClient(BaseClient):
 
     async def download_pdf(self, pmcid: str, output_path) -> bool:
         """Download PDF for a PMCID, handling tar.gz packages.
-        
+
         Args:
             pmcid: The PMCID to download.
             output_path: Path to save the PDF.
-            
+
         Returns:
             True if successful, False otherwise.
         """

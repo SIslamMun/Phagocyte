@@ -12,7 +12,7 @@ from .base import AgentParser, AgentParseResult
 
 class GeminiAgent(AgentParser):
     """Agent that uses Google Gemini for reference parsing.
-    
+
     Supports two backends:
     - google-adk: Uses ADK framework (recommended)
     - google-generativeai: Direct API access
@@ -35,7 +35,7 @@ class GeminiAgent(AgentParser):
         use_adk: bool = True,  # Default to ADK
     ):
         """Initialize Gemini agent.
-        
+
         Args:
             api_key: Google API key (uses GOOGLE_API_KEY env var if not provided)
             model: Model to use (default: gemini-2.0-flash)
@@ -54,10 +54,10 @@ class GeminiAgent(AgentParser):
 
     async def parse_async(self, text: str) -> AgentParseResult:
         """Parse text using Gemini asynchronously.
-        
+
         Args:
             text: Document text to parse
-            
+
         Returns:
             AgentParseResult with extracted references
         """
@@ -174,12 +174,12 @@ class GeminiAgent(AgentParser):
 
     def parse(self, text: str) -> AgentParseResult:
         """Parse text using Gemini synchronously.
-        
+
         Uses google-genai directly for simpler sync usage.
-        
+
         Args:
             text: Document text to parse
-            
+
         Returns:
             AgentParseResult with extracted references
         """

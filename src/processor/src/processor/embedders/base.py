@@ -62,7 +62,7 @@ class BaseEmbedder(ABC):
         texts = [c.content for c in chunks]
         embeddings = await self.embed_batch(texts, batch_size)
 
-        for chunk, embedding in zip(chunks, embeddings):
+        for chunk, embedding in zip(chunks, embeddings, strict=False):
             chunk.embedding = embedding
 
         return chunks

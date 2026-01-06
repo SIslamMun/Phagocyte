@@ -11,6 +11,7 @@ Example: 10.3389/fimmu.2021.737524
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import time
 from pathlib import Path
 from typing import Any
@@ -20,14 +21,14 @@ import httpx
 
 class FrontiersClient:
     """Client for downloading papers from Frontiers.
-    
+
     Frontiers journals include:
     - Frontiers in Immunology (fimmu)
     - Frontiers in Neuroscience (fnins)
     - Frontiers in Microbiology (fmicb)
     - Frontiers in Psychology (fpsyg)
     - And many more...
-    
+
     All papers are Gold Open Access but protected by CloudFlare.
     """
 
@@ -41,7 +42,7 @@ class FrontiersClient:
         use_selenium: bool = True,
     ):
         """Initialize the Frontiers client.
-        
+
         Args:
             enabled: Whether the client is enabled
             timeout: Request timeout in seconds
@@ -53,10 +54,10 @@ class FrontiersClient:
 
     def is_frontiers_doi(self, doi: str) -> bool:
         """Check if a DOI is from Frontiers.
-        
+
         Args:
             doi: DOI to check
-            
+
         Returns:
             True if it's a Frontiers DOI
         """
@@ -64,10 +65,10 @@ class FrontiersClient:
 
     def _get_pdf_url(self, doi: str) -> str:
         """Construct PDF URL from DOI.
-        
+
         Args:
             doi: Frontiers DOI
-            
+
         Returns:
             Direct PDF URL
         """
@@ -77,10 +78,10 @@ class FrontiersClient:
 
     def _get_article_url(self, doi: str) -> str:
         """Construct article page URL from DOI.
-        
+
         Args:
             doi: Frontiers DOI
-            
+
         Returns:
             Article page URL
         """
@@ -92,11 +93,11 @@ class FrontiersClient:
         output_path: Path,
     ) -> dict[str, Any] | None:
         """Download paper by DOI.
-        
+
         Args:
             doi: Frontiers DOI (e.g., "10.3389/fimmu.2021.737524")
             output_path: Path to save the PDF
-            
+
         Returns:
             Dict with 'pdf_path' and 'source' if successful, None otherwise
         """
@@ -157,11 +158,11 @@ class FrontiersClient:
         output_path: Path,
     ) -> dict[str, Any] | None:
         """Download PDF using Selenium to bypass CloudFlare.
-        
+
         Args:
             doi: Frontiers DOI
             output_path: Path to save the PDF
-            
+
         Returns:
             Result dict or None
         """
@@ -256,16 +257,14 @@ class FrontiersClient:
                 return None
             finally:
                 if driver:
-                    try:
+                    with contextlib.suppress(Exception):
                         driver.quit()
-                    except Exception:
-                        pass
 
         return await loop.run_in_executor(None, do_download)
 
     def is_available(self) -> bool:
         """Check if client is available.
-        
+
         Returns:
             True if enabled
         """

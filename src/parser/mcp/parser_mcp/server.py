@@ -219,7 +219,7 @@ class CitationsResult(BaseModel):
 async def retrieve_paper(input: RetrieveInput) -> RetrieveResult:
     """Retrieve a single paper PDF by DOI, title, or arXiv ID.
 
-    Tries multiple sources in priority order: Unpaywall, arXiv, PMC, 
+    Tries multiple sources in priority order: Unpaywall, arXiv, PMC,
     Semantic Scholar, and others.
 
     Args:
@@ -606,7 +606,7 @@ async def verify_citations(input: VerifyInput) -> VerifyResult:
     """Verify BibTeX citations against CrossRef and arXiv.
 
     Validates each citation entry against authoritative sources
-    and classifies them as verified, searched (found by search), 
+    and classifies them as verified, searched (found by search),
     or failed.
 
     Args:

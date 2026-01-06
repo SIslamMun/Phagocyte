@@ -637,11 +637,11 @@ def doi2bib(
 
     Simple lookup - provide a DOI or arXiv ID, get metadata back.
     Can also process a file of DOIs.
-    
+
     Input file formats:
     - TXT: One DOI/arXiv ID per line (dois.txt from parse-refs)
     - JSON: Array of {doi, title, arxiv_id} objects (batch.json from parse-refs)
-    
+
     Priority: title → DOI → arxiv_id (searches by best available identifier)
 
     Examples:
@@ -1137,7 +1137,7 @@ def _save_references(refs, grouped, output_dir: Path, output_format: str, prefix
 
 def _export_for_batch(refs, output_dir: Path, prefix: str = ""):
     """Export references for 'parser batch' command.
-    
+
     Creates a JSON file with format: [{"doi": ..., "title": ..., "pdf_url": ..., "arxiv_id": ...}, ...]
     Merges entries by title to avoid duplicates and collect all metadata.
     Filters out problematic DOIs (peer reviews, book chapters, etc.)
@@ -1264,7 +1264,7 @@ def _export_for_batch(refs, output_dir: Path, prefix: str = ""):
 
 def _export_for_doi2bib(refs, output_dir: Path, prefix: str = ""):
     """Export DOI/arXiv IDs for 'parser doi2bib -i' command.
-    
+
     Creates a text file with one identifier per line.
     Includes both DOIs and arXiv IDs.
     """
@@ -1472,12 +1472,12 @@ def _safe_str(text: str) -> str:
 
 def _load_papers_from_file(filepath: str) -> list[dict[str, str | None]]:
     """Load paper identifiers from file.
-    
+
     Supports multiple input formats:
     - JSON: Array of {doi, title, pdf_url, arxiv_id} objects (from parse-refs --export batch)
     - CSV: With doi,title columns
     - TXT: One identifier per line (DOI, arXiv ID, URL, or title)
-    
+
     Priority for retrieval: title (for metadata search) → DOI → pdf_url → arxiv_id
     """
     import csv
