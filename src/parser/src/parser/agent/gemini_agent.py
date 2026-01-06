@@ -79,7 +79,7 @@ class GeminiAgent(AgentParser):
 
         # Set up environment for ADK
         os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "FALSE"
-        os.environ["GOOGLE_API_KEY"] = self.api_key
+        os.environ["GOOGLE_API_KEY"] = self.api_key or ""
 
         # Create the agent
         agent = Agent(
@@ -90,7 +90,7 @@ class GeminiAgent(AgentParser):
         )
 
         # Create runner and execute
-        runner = Runner(agent=agent, app_name="parser_app")
+        runner = Runner(agent=agent, app_name="parser_app", session_service=None)  # type: ignore[arg-type]
         session = await runner.session_service.create_session(
             app_name="parser_app",
             user_id="parser_user",
@@ -108,9 +108,11 @@ class GeminiAgent(AgentParser):
             ),
         ):
             if hasattr(event, 'content') and event.content:
-                for part in event.content.parts:
-                    if hasattr(part, 'text'):
-                        response_text += part.text
+                parts = event.content.parts
+                if parts:  # Check if parts is not None
+                    for part in parts:
+                        if hasattr(part, 'text') and part.text:
+                            response_text += part.text
 
         # Parse references from response
         references = self._parse_response_json(response_text)
@@ -148,18 +150,18 @@ class GeminiAgent(AgentParser):
             contents=user_message,
         )
 
-        response_text = response.text if hasattr(response, 'text') else str(response)
+        response_text = response.text if hasattr(response, 'text') and response.text else str(response)
 
         # Parse references from response
         references = self._parse_response_json(response_text)
 
         # Extract token usage if available
-        tokens_used = {}
-        if hasattr(response, 'usage_metadata'):
+        tokens_used: dict[str, int] = {}
+        if hasattr(response, 'usage_metadata') and response.usage_metadata:
             usage = response.usage_metadata
-            if hasattr(usage, 'prompt_token_count'):
+            if hasattr(usage, 'prompt_token_count') and usage.prompt_token_count is not None:
                 tokens_used["input"] = usage.prompt_token_count
-            if hasattr(usage, 'candidates_token_count'):
+            if hasattr(usage, 'candidates_token_count') and usage.candidates_token_count is not None:
                 tokens_used["output"] = usage.candidates_token_count
 
         return AgentParseResult(
@@ -167,7 +169,7 @@ class GeminiAgent(AgentParser):
             raw_response=response_text,
             model=self.model,
             agent_type="gemini",
-            tokens_used=tokens_used,
+            tokens_used=tokens_used or None,  # type: ignore[arg-type]
             metadata={"backend": "google-generativeai"},
         )
 
@@ -201,18 +203,18 @@ class GeminiAgent(AgentParser):
             contents=user_message,
         )
 
-        response_text = response.text if hasattr(response, 'text') else str(response)
+        response_text = response.text if hasattr(response, 'text') and response.text else str(response)
 
         # Parse references from response
         references = self._parse_response_json(response_text)
 
         # Extract token usage if available
-        tokens_used = {}
-        if hasattr(response, 'usage_metadata'):
+        tokens_used: dict[str, int] = {}
+        if hasattr(response, 'usage_metadata') and response.usage_metadata:
             usage = response.usage_metadata
-            if hasattr(usage, 'prompt_token_count'):
+            if hasattr(usage, 'prompt_token_count') and usage.prompt_token_count is not None:
                 tokens_used["input"] = usage.prompt_token_count
-            if hasattr(usage, 'candidates_token_count'):
+            if hasattr(usage, 'candidates_token_count') and usage.candidates_token_count is not None:
                 tokens_used["output"] = usage.candidates_token_count
 
         return AgentParseResult(
@@ -220,6 +222,6 @@ class GeminiAgent(AgentParser):
             raw_response=response_text,
             model=self.model,
             agent_type="gemini",
-            tokens_used=tokens_used,
+            tokens_used=tokens_used or None,  # type: ignore[arg-type]
             metadata={"backend": "google-generativeai"},
         )

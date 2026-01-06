@@ -1097,6 +1097,7 @@ def server(db_path: str, port: int, build: bool, detach: bool) -> None:
 
         result = subprocess.run(
             ["docker", "build", "-t", image, str(dockerfile_dir)],
+            text=True,
         )
 
         if result.returncode != 0:

@@ -984,7 +984,7 @@ def parse_refs(
             from .agent import create_agent, is_agent_available
 
             # Check if agent is available
-            available, msg = is_agent_available(agent_type)
+            available, msg = is_agent_available(agent_type)  # type: ignore[arg-type]
             if not available:
                 click.echo(f"Error: {msg}", err=True)
                 sys.exit(1)
@@ -993,7 +993,7 @@ def parse_refs(
             agent_output_dir.mkdir(parents=True, exist_ok=True)
 
             # Create agent
-            agent = create_agent(agent_type, api_key=api_key, model=model)
+            agent = create_agent(agent_type, api_key=api_key, model=model)  # type: ignore[arg-type]
             click.echo(f"Using model: {agent.model}")
 
             # Parse
@@ -1073,15 +1073,15 @@ def parse_refs(
 
         if only_regular:
             click.echo("\nOnly found by Regular parsing:")
-            for ref_type, value in sorted(only_regular)[:10]:
-                click.echo(f"  [{ref_type}] {value[:60]}...")
+            for ref_type, value in sorted(only_regular)[:10]:  # type: ignore[assignment]
+                click.echo(f"  [{ref_type}] {value[:60]}...")  # ref_type is already str
             if len(only_regular) > 10:
                 click.echo(f"  ... and {len(only_regular) - 10} more")
 
         if only_agent:
             click.echo("\nOnly found by Agent parsing:")
-            for ref_type, value in sorted(only_agent)[:10]:
-                click.echo(f"  [{ref_type}] {value[:60]}...")
+            for ref_type, value in sorted(only_agent)[:10]:  # type: ignore[assignment]
+                click.echo(f"  [{ref_type}] {value[:60]}...")  # ref_type is already str
             if len(only_agent) > 10:
                 click.echo(f"  ... and {len(only_agent) - 10} more")
 
@@ -1098,10 +1098,10 @@ def parse_refs(
             f"- Only Agent: {len(only_agent)}",
             "\n## Only in Regular Parsing\n",
         ]
-        for ref_type, value in sorted(only_regular):
+        for ref_type, value in sorted(only_regular):  # type: ignore[assignment]
             comparison_lines.append(f"- [{ref_type}] {value}")
         comparison_lines.append("\n## Only in Agent Parsing\n")
-        for ref_type, value in sorted(only_agent):
+        for ref_type, value in sorted(only_agent):  # type: ignore[assignment]
             comparison_lines.append(f"- [{ref_type}] {value}")
 
         comparison_path.write_text("\n".join(comparison_lines))
@@ -1248,8 +1248,10 @@ def _export_for_batch(refs, output_dir: Path, prefix: str = ""):
     if skipped_dois:
         click.echo(f"⚠ Skipped {len(skipped_dois)} problematic DOIs:")
         for item in skipped_dois[:5]:  # Show first 5
-            click.echo(f"  - {item['doi'][:50]}...")
-            click.echo(f"    Reason: {item['reason'][:80]}...")
+            doi = item.get('doi', '')
+            reason = item.get('reason', '')
+            click.echo(f"  - {doi[:50]}...")
+            click.echo(f"    Reason: {reason[:80]}...")
         if len(skipped_dois) > 5:
             click.echo(f"  ... and {len(skipped_dois) - 5} more")
 

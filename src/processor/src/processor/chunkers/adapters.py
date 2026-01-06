@@ -164,7 +164,7 @@ class LlamaIndexCodeAdapter(BaseChunker):
         # Simple line-based splitting
         lines = content.split("\n")
         chunks = []
-        current_chunk_lines = []
+        current_chunk_lines: list[str] = []
         current_size = 0
 
         for line in lines:
@@ -332,11 +332,11 @@ class LlamaIndexMarkdownAdapter(BaseChunker):
         for match in header_pattern.finditer(content):
             # Save content before this header
             if last_end < match.start():
-                section_content = content[last_end : match.start()].strip()
-                if section_content:
+                section_text = content[last_end : match.start()].strip()
+                if section_text:
                     sections.append(
                         {
-                            "content": section_content,
+                            "content": section_text,
                             "path": " > ".join(current_path) if current_path else None,
                         }
                     )
@@ -365,7 +365,7 @@ class LlamaIndexMarkdownAdapter(BaseChunker):
         # Convert sections to chunks
         chunks = []
         for section in sections:
-            section_content = section["content"]
+            section_content: str = section["content"] or ""
 
             # Further split if section is too large
             if len(section_content) > self.chunk_size:

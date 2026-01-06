@@ -233,7 +233,7 @@ class ACLAnthologyClient:
         Returns:
             List of paper metadata
         """
-        results = []
+        results: list[dict[str, Any]] = []
 
         # Look for paper links with anthology IDs
         # Pattern: /anthology/{id}/ or /{id}/ format

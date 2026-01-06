@@ -105,7 +105,7 @@ class OpenCLIPEmbedder(BaseEmbedder):
         return hf_models.get((self.model_name, self.pretrained), "")
 
     @property
-    def dimensions(self) -> int:
+    def dimensions(self) -> int:  # type: ignore[override]
         """Get embedding dimensions."""
         if self._dimensions is None:
             self._get_model()

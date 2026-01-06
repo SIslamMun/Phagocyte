@@ -1254,7 +1254,7 @@ class PaperRetriever:
                     )
 
                 if verbose:
-                    print(f"\n[{idx}/{total}] Processing: {identifier[:60]}...")
+                    print(f"\n[{idx}/{total}] Processing: {(identifier or '')[:60]}...")
 
                 result = await self.retrieve(
                     doi=doi,
@@ -1266,7 +1266,7 @@ class PaperRetriever:
                 )
 
                 # Save progress
-                if save_progress and result.status in (RetrievalStatus.SUCCESS, RetrievalStatus.SKIPPED):
+                if save_progress and result.status in (RetrievalStatus.SUCCESS, RetrievalStatus.SKIPPED) and identifier:
                     completed.add(identifier)
                     try:
                         with open(progress_file, "w") as f:
