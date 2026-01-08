@@ -458,20 +458,24 @@ def ingest_crawl(url, output, max_pages, max_depth, strategy, verbose):
 @click.option("--branch", help="Branch to clone")
 @click.option("--shallow/--no-shallow", default=True, help="Shallow clone")
 @click.option("--max-files", default=500, help="Maximum files to process")
+@click.option("--keep-source", is_flag=True, help="Keep source code files separately (for processor code chunking)")
 @click.option("-v", "--verbose", is_flag=True, help="Verbose output")
-def ingest_clone(repo, output, branch, shallow, max_files, verbose):
+def ingest_clone(repo, output, branch, shallow, max_files, keep_source, verbose):
     """Clone and ingest a git repository.
 
     \b
     Examples:
       phagocyte ingest clone https://github.com/user/repo
       phagocyte ingest clone git@github.com:user/repo.git --branch develop
+      phagocyte ingest clone https://github.com/user/repo --keep-source
     """
     args = ["clone", repo, "-o", output, "--max-files", str(max_files)]
     if branch:
         args.extend(["--branch", branch])
     if not shallow:
         args.append("--no-shallow")
+    if keep_source:
+        args.append("--keep-source")
     if verbose:
         args.append("-v")
     sys.exit(run_module("ingestor", args))
@@ -596,7 +600,17 @@ def process_run(
 )
 @click.option("--hybrid", is_flag=True, help="Use hybrid search (vector + BM25)")
 @click.option("--rerank", is_flag=True, help="Rerank results with cross-encoder")
-def process_search(db_path, query, limit, table, hybrid, rerank):
+@click.option(
+    "--text-profile",
+    type=click.Choice(["low", "medium", "high"]),
+    help="Text embedding profile (must match what was used during processing)",
+)
+@click.option(
+    "--code-profile",
+    type=click.Choice(["low", "high"]),
+    help="Code embedding profile (must match what was used during processing)",
+)
+def process_search(db_path, query, limit, table, hybrid, rerank, text_profile, code_profile):
     """Search the vector database.
 
     \b
@@ -609,6 +623,10 @@ def process_search(db_path, query, limit, table, hybrid, rerank):
         args.append("--hybrid")
     if rerank:
         args.append("--rerank")
+    if text_profile:
+        args.extend(["--text-profile", text_profile])
+    if code_profile:
+        args.extend(["--code-profile", code_profile])
     sys.exit(run_module("processor", args))
 
 

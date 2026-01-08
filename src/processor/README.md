@@ -6,6 +6,7 @@ RAG (Retrieval-Augmented Generation) document processor that chunks, embeds, and
 
 - **Multi-format Support**: Code (26+ languages), papers, markdown, web content
 - **AST-aware Chunking**: Structure-aware chunking using tree-sitter for code, header-aware for documents
+- **Code Block Extraction**: Automatically extracts fenced code blocks from markdown as separate code chunks
 - **Multiple Embedding Backends**: Ollama (default), Transformers, OpenCLIP for multimodal
 - **Embedding Profiles**: Quality vs speed tradeoffs (low/medium/high)
 - **LanceDB Storage**: Embedded vector database with hybrid search (vector + BM25)

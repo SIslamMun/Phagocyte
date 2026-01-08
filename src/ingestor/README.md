@@ -190,6 +190,9 @@ ingestor clone https://github.com/owner/repo --submodules
 
 # Limit files processed
 ingestor clone https://github.com/owner/repo --max-files 100 --max-file-size 100000
+
+# Keep original source files (for code-aware RAG chunking)
+ingestor clone https://github.com/owner/repo --keep-source
 ```
 
 #### Private Repository Authentication

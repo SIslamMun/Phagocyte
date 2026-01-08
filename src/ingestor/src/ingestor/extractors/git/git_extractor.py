@@ -36,6 +36,10 @@ class GitRepoConfig:
     tag: str | None = None  # Specific tag to clone
     commit: str | None = None  # Specific commit to checkout
 
+    # Output options
+    keep_source_files: bool = False  # Copy source files to output (for processor code chunking)
+    source_files_dir: str = "source"  # Subdirectory name for source files
+
     # File filtering
     include_extensions: set[str] = field(default_factory=lambda: {
         # Source code
@@ -694,6 +698,8 @@ class GitExtractor(BaseExtractor):
         self, repo_path: Path, source: str
     ) -> ExtractionResult:
         """Extract content from a local git repository."""
+        from ...types import SourceFile
+
         repo_name = repo_path.name
 
         metadata = await self._get_repo_metadata(repo_path)
@@ -710,6 +716,28 @@ class GitExtractor(BaseExtractor):
             source=source,
         )
 
+        # Build source_files list if keep_source_files is enabled
+        source_files = []
+        if self.config.keep_source_files:
+            # Source code extensions for processor code chunking
+            code_extensions = {
+                ".py", ".js", ".ts", ".jsx", ".tsx", ".java", ".c", ".cpp", ".h", ".hpp",
+                ".go", ".rs", ".rb", ".php", ".swift", ".kt", ".scala",
+                ".sh", ".bash", ".zsh",
+            }
+            for file_info in files_content:
+                if file_info.get("type") == "text" and file_info.get("content"):
+                    path = file_info["path"]
+                    ext = Path(path).suffix.lower()
+                    # Only include source code files
+                    if ext in code_extensions:
+                        source_files.append(SourceFile(
+                            path=path,
+                            content=file_info["content"],
+                            language=file_info.get("language"),
+                            size_bytes=file_info.get("size", 0),
+                        ))
+
         return ExtractionResult(
             markdown=markdown,
             title=repo_name,
@@ -717,6 +745,7 @@ class GitExtractor(BaseExtractor):
             media_type=MediaType.GIT,
             images=images,
             metadata=metadata,
+            source_files=source_files,
         )
 
     async def _get_repo_metadata(self, repo_path: Path) -> dict[str, Any]:

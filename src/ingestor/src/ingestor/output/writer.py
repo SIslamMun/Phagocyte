@@ -81,6 +81,19 @@ class OutputWriter:
         async with aiofiles.open(md_path, "w", encoding="utf-8") as f:
             await f.write(result.markdown)
 
+        # Write source files if present (for code chunking by processor)
+        if result.source_files:
+            source_dir = output_dir / "source"
+            source_dir.mkdir(exist_ok=True)
+
+            for source_file in result.source_files:
+                # Create subdirectories as needed
+                file_path = source_dir / source_file.path
+                file_path.parent.mkdir(parents=True, exist_ok=True)
+
+                async with aiofiles.open(file_path, "w", encoding="utf-8") as f:
+                    await f.write(source_file.content)
+
         # Write metadata if enabled
         if self.config.generate_metadata:
             await self._write_metadata(result, output_dir / "metadata.json")

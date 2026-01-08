@@ -231,6 +231,7 @@ def crawl(ctx: click.Context, url: str, **kwargs):
 @click.option("--max-files", type=int, default=500, help="Maximum files to process")
 @click.option("--max-file-size", type=int, default=500000, help="Maximum file size in bytes")
 @click.option("--include-binary", is_flag=True, help="Include binary file metadata")
+@click.option("--keep-source", is_flag=True, help="Keep source code files separately (for processor code chunking)")
 @click.option("--metadata", is_flag=True, help="Generate JSON metadata files")
 @click.option("-v", "--verbose", is_flag=True, help="Verbose output")
 @click.pass_context
@@ -265,6 +266,7 @@ def clone(ctx: click.Context, repo: str, **kwargs):
             max_total_files=kwargs.get("max_files", 500),
             max_file_size=kwargs.get("max_file_size", 500000),
             include_binary_metadata=kwargs.get("include_binary", False),
+            keep_source_files=kwargs.get("keep_source", False),
         )
 
         # Create registry for nested extractions
@@ -284,6 +286,8 @@ def clone(ctx: click.Context, repo: str, **kwargs):
             console.print(f"  Tag: {git_config.tag}")
         if git_config.shallow:
             console.print(f"  Shallow clone: depth={git_config.depth}")
+        if git_config.keep_source_files:
+            console.print(f"  Keep source files: enabled")
 
         with Progress(
             SpinnerColumn(spinner_name=_SPINNER),

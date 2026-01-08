@@ -114,6 +114,7 @@ uv run phagocyte ingest describe <path>   # Generate VLM image descriptions
 | `clone` | `--branch` | Git branch to clone |
 | `clone` | `--shallow` | Shallow clone (faster) |
 | `clone` | `--max-files` | Maximum files to process |
+| `clone` | `--keep-source` | Keep original source files for code chunking |
 
 ### Process (11 commands)
 ```bash
@@ -133,8 +134,8 @@ uv run phagocyte process test-e2e         # Run end-to-end validation
 **Options:**
 | Command | Option | Description |
 |---------|--------|-------------|
-| `run` | `--text-profile` | Chunking profile: `low`, `medium`, `high` |
-| `run` | `--code-profile` | Code chunking: `low`, `medium`, `high` |
+| `run` | `--text-profile` | Text embedding: `low` (0.6B), `medium` (4B), `high` (8B) |
+| `run` | `--code-profile` | Code embedding: `low` (0.5B), `high` (1.5B) |
 | `run` | `--table-mode` | Table handling: `separate`, `unified`, `both` |
 | `run` | `--incremental` | Only process new/changed files |
 | `run` | `--batch-size` | Documents per batch |

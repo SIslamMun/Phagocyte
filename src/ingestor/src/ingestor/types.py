@@ -65,6 +65,16 @@ class ExtractedImage:
 
 
 @dataclass
+class SourceFile:
+    """Represents a source code file extracted from a repository."""
+
+    path: str  # Relative path within the repo
+    content: str  # File content
+    language: str | None = None  # Programming language
+    size_bytes: int = 0
+
+
+@dataclass
 class ExtractionResult:
     """Result of extracting content from a source."""
 
@@ -75,6 +85,7 @@ class ExtractionResult:
     images: list[ExtractedImage] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
     charset: str | None = None  # Detected charset for text files
+    source_files: list[SourceFile] = field(default_factory=list)  # Source code files for RAG
 
     @property
     def has_images(self) -> bool:

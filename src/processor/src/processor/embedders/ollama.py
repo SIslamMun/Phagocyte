@@ -59,12 +59,13 @@ class OllamaEmbedder(BaseEmbedder):
         for attempt in range(max_retries):
             try:
                 response = await client.post(
-                    f"{self.host}/api/embeddings",
-                    json={"model": self.model_name, "prompt": text},
+                    f"{self.host}/api/embed",
+                    json={"model": self.model_name, "input": text},
                 )
                 response.raise_for_status()
                 data = response.json()
-                embedding = data["embedding"]
+                # New API returns embeddings as list of lists
+                embedding = data["embeddings"][0] if "embeddings" in data else data["embedding"]
 
                 # Update dimensions from actual response
                 if self.dimensions == 0:
