@@ -168,6 +168,18 @@ def setup(ctx: click.Context, skip_download: bool, minimal: bool) -> None:
     default="auto",
     help="Force content type",
 )
+@click.option(
+    "--chunk-only",
+    is_flag=True,
+    default=False,
+    help="Only chunk files, skip embedding (saves with zero vectors)",
+)
+@click.option(
+    "--clean",
+    is_flag=True,
+    default=False,
+    help="Delete output database before processing (fresh start)",
+)
 @click.pass_context
 def process(
     ctx: click.Context,
@@ -184,6 +196,8 @@ def process(
     batch_size: int,
     incremental: bool,
     content_type: str,
+    chunk_only: bool,
+    clean: bool,
 ) -> None:
     """Process files through chunking, embedding, and loading.
 
@@ -202,7 +216,15 @@ def process(
     For multimodal/unified table (CLIP), use:
       --multimodal-profile low|high --table-mode unified
     """
+    import shutil
     from .pipeline.processor import Pipeline
+
+    # Clean output directory if requested
+    if clean:
+        output_path = Path(output)
+        if output_path.exists():
+            console.print(f"[yellow]Cleaning output directory: {output}[/yellow]")
+            shutil.rmtree(output_path)
 
     async def run() -> None:
         # Load config
@@ -221,6 +243,7 @@ def process(
             batch_size=batch_size,
             incremental=incremental,
             verbose=ctx.obj.get("verbose", False),
+            chunk_only=chunk_only,
         )
 
         console.print(f"[bold]Processing: {input_path}[/bold]")
@@ -228,6 +251,8 @@ def process(
         console.print(f"  Backend: {embedder}")
         console.print(f"  Table mode: {table_mode}")
         console.print(f"  Incremental: {incremental}")
+        if chunk_only:
+            console.print(f"  [yellow]Chunk-only mode: skipping embeddings[/yellow]")
         console.print()
 
         pipeline = Pipeline(config)

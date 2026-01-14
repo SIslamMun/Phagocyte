@@ -123,6 +123,7 @@ class ProcessorConfig(BaseModel):
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
     processing: ProcessingConfig = Field(default_factory=ProcessingConfig)
     verbose: bool = Field(default=False, description="Verbose output")
+    chunk_only: bool = Field(default=False, description="Only chunk files, skip embedding (stores zero vectors)")
 
     @classmethod
     def from_yaml(cls, path: Path) -> "ProcessorConfig":
@@ -157,6 +158,7 @@ class ProcessorConfig(BaseModel):
             "table_mode": ("database", "table_mode"),
             "incremental": ("processing", "incremental"),
             "verbose": ("verbose",),
+            "chunk_only": ("chunk_only",),
         }
 
         for cli_key, config_path in cli_mappings.items():

@@ -219,22 +219,33 @@ class Pipeline:
         input_root = input_path if input_path.is_dir() else input_path.parent
         loader = LanceDBLoader.from_config(self.config.database, input_root=input_root)
 
+        # Skip index creation in chunk-only mode (zero vectors are all duplicates)
+        create_index = not self.config.chunk_only
+
         # Embed and load text/code chunks
         if all_chunks:
-            console.print(f"[cyan]Generating embeddings for {len(all_chunks)} chunks...[/cyan]")
-            all_chunks = await self._embed_chunks(all_chunks)
+            if self.config.chunk_only:
+                console.print(f"[yellow]Chunk-only mode: using zero vectors for {len(all_chunks)} chunks[/yellow]")
+                all_chunks = self._set_zero_embeddings(all_chunks)
+            else:
+                console.print(f"[cyan]Generating embeddings for {len(all_chunks)} chunks...[/cyan]")
+                all_chunks = await self._embed_chunks(all_chunks)
 
             console.print("Loading text/code into LanceDB...")
-            counts = await loader.load_chunks(all_chunks)
+            counts = await loader.load_chunks(all_chunks, create_index=create_index)
             console.print(f"[green]✓[/green] Loaded: text={counts['text_chunks']}, code={counts['code_chunks']}, unified={counts['unified_chunks']}")
 
         # Embed image chunks (dual embeddings)
         if image_chunks:
-            console.print(f"[cyan]Generating embeddings for {len(image_chunks)} images...[/cyan]")
-            image_chunks = await self._embed_image_chunks(image_chunks)
+            if self.config.chunk_only:
+                console.print(f"[yellow]Chunk-only mode: using zero vectors for {len(image_chunks)} images[/yellow]")
+                image_chunks = self._set_zero_image_embeddings(image_chunks)
+            else:
+                console.print(f"[cyan]Generating embeddings for {len(image_chunks)} images...[/cyan]")
+                image_chunks = await self._embed_image_chunks(image_chunks)
 
             console.print("Loading images into LanceDB...")
-            image_counts = await loader.load_image_chunks(image_chunks)
+            image_counts = await loader.load_image_chunks(image_chunks, create_index=create_index)
             console.print(f"[green]✓[/green] Loaded: images={image_counts['image_chunks']}")
 
         # Save state
@@ -424,6 +435,34 @@ class Pipeline:
             for chunk in image_chunks:
                 chunk.visual_embedding = chunk.text_embedding
 
+        return image_chunks
+
+    def _set_zero_embeddings(self, chunks: list[Chunk]) -> list[Chunk]:
+        """Set zero vector embeddings for chunk-only mode.
+
+        Uses appropriate dimensions based on chunk type:
+        - Text chunks: 1024 dimensions (default text embedding size)
+        - Code chunks: 768 dimensions (default code embedding size)
+        """
+        for chunk in chunks:
+            if chunk.source_type.value.startswith("code_"):
+                # Code chunks use 768 dimensions by default
+                chunk.embedding = [0.0] * 768
+            else:
+                # Text chunks use 1024 dimensions by default
+                chunk.embedding = [0.0] * 1024
+        return chunks
+
+    def _set_zero_image_embeddings(self, image_chunks: list[ImageChunk]) -> list[ImageChunk]:
+        """Set zero vector embeddings for image chunks in chunk-only mode.
+
+        Uses:
+        - text_embedding: 1024 dimensions (text embedder size)
+        - visual_embedding: 1024 dimensions (CLIP size)
+        """
+        for chunk in image_chunks:
+            chunk.text_embedding = [0.0] * 1024
+            chunk.visual_embedding = [0.0] * 1024
         return image_chunks
 
     async def _close_embedders(self) -> None:
