@@ -169,6 +169,7 @@ def batch(ctx: click.Context, folder: str, recursive: bool, concurrency: int, **
 @click.option("--include", type=str, multiple=True, help="URL patterns to include")
 @click.option("--exclude", type=str, multiple=True, help="URL patterns to exclude")
 @click.option("--domain", type=str, help="Restrict to domain")
+@click.option("--extract-pdfs/--no-extract-pdfs", default=True, help="Download and extract PDFs during crawl")
 @click.option("--metadata", is_flag=True, help="Generate JSON metadata")
 @click.option("-v", "--verbose", is_flag=True, help="Verbose output")
 @click.pass_context
@@ -201,9 +202,28 @@ def crawl(ctx: click.Context, url: str, **kwargs):
         extractor.strategy = config.crawl_strategy
         extractor.max_depth = config.crawl_max_depth
         extractor.max_pages = config.crawl_max_pages
+        extractor.extract_pdfs = kwargs.get("extract_pdfs", True)
+        
+        # Apply URL filters
+        if kwargs.get("include"):
+            extractor.include_patterns = list(kwargs["include"])
+            console.print(f"[yellow]Include filter:[/yellow] {extractor.include_patterns}")
+        if kwargs.get("exclude"):
+            extractor.exclude_patterns = list(kwargs["exclude"])
+            console.print(f"[yellow]Exclude filter:[/yellow] {extractor.exclude_patterns}")
+        if kwargs.get("domain"):
+            extractor.same_domain = True
+            console.print(f"[yellow]Domain filter:[/yellow] {kwargs['domain']}")
 
         count = 0
         results = await extractor.crawl_deep(url)
+        
+        # Filter results if include patterns specified
+        if kwargs.get("include"):
+            filtered_results = [r for r in results if any(p in r.source for p in extractor.include_patterns)]
+            console.print(f"[yellow]Filtered {len(results)} pages down to {len(filtered_results)} matching pages[/yellow]")
+            results = filtered_results
+        
         for result in results:
             try:
                 await writer.write(result)
@@ -470,6 +490,92 @@ def _create_registry():
         pass
 
     return registry
+
+
+@main.command()
+@click.argument("directory", type=click.Path(exists=True, file_okay=False, path_type=Path))
+@click.option("--min-lines", type=int, default=30, help="Minimum lines for quality page")
+@click.option("--min-words", type=int, default=100, help="Minimum words for quality page")
+@click.option("--max-link-ratio", type=float, default=0.6, help="Maximum link ratio (0-1)")
+@click.option("--detect-toc", is_flag=True, help="Enable TIER 3 TOC detection (for documentation sites)")
+@click.option("--remove", is_flag=True, help="Remove low-quality files")
+@click.option("--report", type=click.Path(path_type=Path), help="Save report to file")
+def filter(
+    directory: Path,
+    min_lines: int,
+    min_words: int,
+    max_link_ratio: float,
+    detect_toc: bool,
+    remove: bool,
+    report: Path | None,
+):
+    """Filter low-quality pages from crawled documentation.
+    
+    This command analyzes markdown files and identifies low-quality pages such as:
+    - Empty/blank pages
+    - Navigation-only pages
+    - Login/contact/about pages
+    - Download/release pages
+    
+    Examples:
+        # Analyze quality without removing
+        uv run ingestor filter ./output
+        
+        # Remove low-quality files
+        uv run ingestor filter ./output --remove
+        
+        # Custom thresholds
+        uv run ingestor filter ./output --min-lines 50 --min-words 200 --remove
+    """
+    from .filters import UniversalFilter
+
+    console.print(f"[cyan]Filtering files in:[/cyan] {directory}")
+    console.print(f"[cyan]Thresholds:[/cyan] min_lines={min_lines}, min_words={min_words}, max_link_ratio={max_link_ratio}")
+    if detect_toc:
+        console.print(f"[cyan]TIER 3 TOC detection:[/cyan] ENABLED")
+    console.print()
+
+    universal_filter = UniversalFilter(
+        min_lines=min_lines,
+        min_words=min_words,
+        max_link_ratio=max_link_ratio,
+        detect_toc=detect_toc,
+    )
+    
+    with Progress(
+        SpinnerColumn(spinner_name=_SPINNER),
+        TextColumn("[progress.description]{task.description}"),
+        console=console,
+    ) as progress:
+        task = progress.add_task("Analyzing files...", total=None)
+        results = universal_filter.filter_directory(directory)
+        progress.update(task, completed=True)
+    
+    # Remove low-quality files if requested
+    removed_count = 0
+    if remove:
+        import shutil
+        for filepath, result in results.items():
+            if not result.keep:
+                path = Path(filepath)
+                # Remove the parent directory (the page folder)
+                parent_dir = path.parent
+                if parent_dir.exists() and parent_dir != directory:
+                    shutil.rmtree(parent_dir)
+                    removed_count += 1
+    
+    report_text = universal_filter.generate_report(results)
+    console.print(report_text)
+    
+    if report:
+        report.write_text(report_text)
+        console.print(f"\n[green]Report saved to:[/green] {report}")
+    
+    kept_count = sum(1 for r in results.values() if r.keep)
+    if remove:
+        console.print(f"\n[green]✓ Kept {kept_count} quality pages, removed {removed_count} low-quality pages[/green]")
+    else:
+        console.print(f"\n[yellow]Run with --remove to delete low-quality files[/yellow]")
 
 
 if __name__ == "__main__":

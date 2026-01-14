@@ -28,6 +28,7 @@ class WebExtractor(BaseExtractor):
         include_patterns: list[str] | None = None,
         exclude_patterns: list[str] | None = None,
         same_domain: bool = True,
+        extract_pdfs: bool = True,
     ):
         """Initialize web extractor.
 
@@ -38,6 +39,7 @@ class WebExtractor(BaseExtractor):
             include_patterns: URL patterns to include
             exclude_patterns: URL patterns to exclude
             same_domain: Restrict to same domain
+            extract_pdfs: Download and extract PDF files after crawl
         """
         self.strategy = strategy
         self.max_depth = max_depth
@@ -45,6 +47,8 @@ class WebExtractor(BaseExtractor):
         self.include_patterns = include_patterns or []
         self.exclude_patterns = exclude_patterns or []
         self.same_domain = same_domain
+        self.extract_pdfs = extract_pdfs
+        self.pdf_urls: list[str] = []
 
     async def extract(self, source: str | Path) -> ExtractionResult:
         """Extract content from a URL.
@@ -156,6 +160,8 @@ class WebExtractor(BaseExtractor):
         )
 
         results = []
+        self.pdf_urls = []  # Reset PDF URLs list
+        
         async with AsyncWebCrawler(config=browser_config) as crawler:
             crawl_results = await crawler.arun(url=url, config=run_config)
             # Handle both list and single result
@@ -163,6 +169,12 @@ class WebExtractor(BaseExtractor):
                 crawl_results = [crawl_results]
 
             for result in crawl_results:
+                # Collect PDF URLs for later processing
+                if result.url.lower().endswith('.pdf'):
+                    if self.extract_pdfs:
+                        self.pdf_urls.append(result.url)
+                    continue
+
                 if result.success:
                     markdown = result.markdown or ""
                     title = result.metadata.get("title", "") if result.metadata else ""
@@ -180,6 +192,16 @@ class WebExtractor(BaseExtractor):
                         images=images,
                         metadata={"url": result.url},
                     ))
+
+        # Extract PDFs in parallel after web crawl completes
+        if self.extract_pdfs and self.pdf_urls:
+            import asyncio
+            pdf_tasks = [self._extract_pdf(pdf_url) for pdf_url in self.pdf_urls]
+            pdf_results = await asyncio.gather(*pdf_tasks, return_exceptions=True)
+            
+            for pdf_result in pdf_results:
+                if isinstance(pdf_result, ExtractionResult):
+                    results.append(pdf_result)
 
         return results
 
@@ -242,6 +264,51 @@ class WebExtractor(BaseExtractor):
                         pass
 
         return images, image_url_map
+
+    async def _extract_pdf(self, url: str) -> ExtractionResult | None:
+        """Download and extract a PDF file.
+
+        Args:
+            url: PDF URL
+
+        Returns:
+            Extraction result for the PDF, or None if extraction fails
+        """
+        try:
+            from ..pdf import PDFExtractor
+            import aiohttp
+            import tempfile
+            
+            # Download PDF
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    if response.status != 200:
+                        return None
+                    
+                    pdf_data = await response.read()
+                    
+                    # Skip if it's too small (likely an error page)
+                    if len(pdf_data) < 1000:
+                        return None
+                    
+                    # Save to temporary file and extract
+                    with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp:
+                        tmp.write(pdf_data)
+                        tmp_path = Path(tmp.name)
+                    
+                    try:
+                        extractor = PDFExtractor()
+                        result = await extractor.extract(tmp_path)
+                        result.source = url  # Override source to be the URL
+                        result.metadata = result.metadata or {}
+                        result.metadata["pdf_url"] = url
+                        return result
+                    finally:
+                        tmp_path.unlink(missing_ok=True)
+        except Exception as e:
+            # Log but don't fail the entire crawl
+            print(f"Failed to extract PDF {url}: {e}")
+            return None
 
     def _rewrite_image_paths(self, markdown: str, image_url_map: dict[str, str]) -> str:
         """Rewrite image URLs in markdown to point to extracted images.
